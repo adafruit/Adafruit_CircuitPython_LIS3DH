@@ -29,9 +29,12 @@ lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c)
 # Set range of accelerometer (can be RANGE_2_G, RANGE_4_G, RANGE_8_G or RANGE_16_G).
 lis3dh.range = adafruit_lis3dh.RANGE_2_G
 
-# Set click detection to double and single clicks.  The second parameter is
-# the threshold and a higher value means less sensitive click detection.  Note
-# the threshold should be set based on the range above:
+# Set click detection to double and single clicks.  The first parameter is a value:
+#  - 0 = Disable click detection.
+#  - 1 = Detect single clicks.
+#  - 2 = Detect single and double clicks.
+# The second parameter is the threshold and a higher value means less sensitive 
+# click detection.  Note the threshold should be set based on the range above:
 #  - 2G = 40-80 threshold
 #  - 4G = 20-40 threshold
 #  - 8G = 10-20 threshold
