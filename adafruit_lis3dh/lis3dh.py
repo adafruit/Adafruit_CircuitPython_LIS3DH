@@ -224,26 +224,23 @@ class LIS3DH_I2C(LIS3DH):
 
 class LIS3DH_SPI(LIS3DH):
 
-    def __init__(self, spi, cs, baudrate=500000):
+    def __init__(self, spi, cs, baudrate=100000):
         self._spi = spi_device.SPIDevice(spi, cs, baudrate=baudrate)
+        self._buffer = bytearray(6)
         super().__init__()
 
     def _read_register(self, register, length):
-        # TODO: Once https://github.com/adafruit/circuitpython/issues/108 is
-        # resolved switch away from dynamic buffers to a single static one.
-        request = bytearray(1)
-        request[0] = (register | 0x80) & 0xFF  # Read, bit 7 high.
-        result = bytearray(length)
+        if length == 1:
+            self._buffer[0] = (register | 0x80) & 0xFF  # Read single, bit 7 high.
+        else:
+            self._buffer[0] = (register | 0xC0) & 0xFF  # Read multiple, bit 6&7 high.
         with self._spi as spi:
-            spi.write(request)
-            spi.readinto(result)
-            return result
+            spi.write(self._buffer, start=0, end=1)
+            spi.readinto(self._buffer, start=0, end=length)
+            return self._buffer
 
     def _write_register_byte(self, register, value):
-        # TODO: Once https://github.com/adafruit/circuitpython/issues/108 is
-        # resolved switch away from dynamic buffers to a single static one.
-        request = bytearray(2)
-        request[0] = (register & ~0x80) & 0xFF  # Write, bit 7 low.
-        request[1] = value & 0xFF
+        self._buffer[0] = (register & (~0x80 & 0xFF)) & 0xFF  # Write, bit 7 low.
+        self._buffer[1] = value & 0xFF
         with self._spi as spi:
-            spi.write(request)
+            spi.write(self._buffer, start=0, end=2)
