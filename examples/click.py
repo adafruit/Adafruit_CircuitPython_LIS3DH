@@ -10,8 +10,8 @@ import adafruit_lis3dh
 # Uncomment _one_ of the hardware setups below depending on your wiring:
 
 # Hardware I2C setup:
-import nativeio
-i2c = nativeio.I2C(board.SCL, board.SDA)
+import busio
+i2c = busio.I2C(board.SCL, board.SDA)
 lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c)
 
 # Software I2C setup:
@@ -20,9 +20,9 @@ lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c)
 #lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c)
 
 # Hardware SPI setup:
-#import nativeio
-#spi = nativeio.SPI(board.SCK, board.MOSI, board.MISO)
-#cs = nativeio.DigitalInOut(board.D6)  # Set to appropriate CS pin!
+#import busio
+#spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
+#cs = busio.DigitalInOut(board.D6)  # Set to appropriate CS pin!
 #lis3dh = adafruit_lis3dh.LIS3DH_SPI(spi, cs)
 
 
@@ -33,7 +33,7 @@ lis3dh.range = adafruit_lis3dh.RANGE_2_G
 #  - 0 = Disable click detection.
 #  - 1 = Detect single clicks.
 #  - 2 = Detect single and double clicks.
-# The second parameter is the threshold and a higher value means less sensitive 
+# The second parameter is the threshold and a higher value means less sensitive
 # click detection.  Note the threshold should be set based on the range above:
 #  - 2G = 40-80 threshold
 #  - 4G = 20-40 threshold
