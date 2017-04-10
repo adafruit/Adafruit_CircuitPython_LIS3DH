@@ -5,9 +5,7 @@
 # License: MIT License (https://en.wikipedia.org/wiki/MIT_License)
 import ustruct
 
-import adafruit_bus_device.i2c_device as i2c_device
-import adafruit_bus_device.spi_device as spi_device
-
+from micropython import const
 
 # Register addresses:
 REG_OUTADC1_L   = const(0x08)
@@ -92,9 +90,10 @@ class LIS3DH:
         ctl4 |= range_value << 4
         self._write_register_byte(REG_CTRL4, ctl4)
 
-    def read_accel_g(self):
+    @property
+    def acceleration(self):
         """Read the x, y, z acceleration values.  These values are returned in
-        a 3-tuple and are in gravities (G).
+        a 3-tuple and are in m / s ^ 2.
         """
         data = self._read_register(REG_OUT_X_L | 0x80, 6)
         x = ustruct.unpack('<h', data[0:2])[0]
@@ -110,7 +109,7 @@ class LIS3DH:
             divider = 8190
         elif accel_range == RANGE_2_G:
             divider = 16380
-        return (x / divider, y / divider, z / divider)
+        return (x / divider * 9.806, y / divider * 9.806, z / divider * 9.806)
 
     def read_adc_raw(self, adc):
         """Retrieve the raw analog to digital converter value.  ADC must be a
@@ -204,6 +203,7 @@ class LIS3DH:
 class LIS3DH_I2C(LIS3DH):
 
     def __init__(self, i2c, address=0x18):
+        import adafruit_bus_device.i2c_device as i2c_device
         self._i2c = i2c_device.I2CDevice(i2c, address)
         self._buffer = bytearray(6)
         super().__init__()
@@ -211,20 +211,21 @@ class LIS3DH_I2C(LIS3DH):
     def _read_register(self, register, length):
         self._buffer[0] = register & 0xFF
         with self._i2c as i2c:
-            i2c.writeto(self._buffer, start=0, end=1)
-            i2c.readfrom_into(self._buffer, start=0, end=length)
+            i2c.write(self._buffer, start=0, end=1)
+            i2c.read_into(self._buffer, start=0, end=length)
             return self._buffer
 
     def _write_register_byte(self, register, value):
         self._buffer[0] = register & 0xFF
         self._buffer[1] = value & 0xFF
         with self._i2c as i2c:
-            i2c.writeto(self._buffer, start=0, end=2)
+            i2c.write(self._buffer, start=0, end=2)
 
 
 class LIS3DH_SPI(LIS3DH):
 
     def __init__(self, spi, cs, baudrate=100000):
+        import adafruit_bus_device.spi_device as spi_device
         self._spi = spi_device.SPIDevice(spi, cs, baudrate=baudrate)
         self._buffer = bytearray(6)
         super().__init__()
