@@ -150,7 +150,7 @@ class LIS3DH:
         raw = self.read_click_raw()
         return (raw & 0x10 > 0, raw & 0x20 > 0)
 
-    def set_click(self, click, threshold, time_limit=10, time_latency=20, time_window=255):
+    def set_click(self, click, threshold, time_limit=10, time_latency=20, time_window=255, click_cfg=None):
         """Set the click detection parameters.  Must specify at least:
             click - Set to 0 to disable click detection, 1 to detect only single
                     clicks, and 2 to detect single & double clicks.
@@ -163,9 +163,9 @@ class LIS3DH:
             time_latency - Time latency register value (default 20).
             time_window - Time window register value (default 255).
         """
-        if click < 0 or click > 2:
+        if (click < 0 or click > 2) and click_cfg is None:
             raise ValueError('Click must be 0 (disabled), 1 (single click), or 2 (double click)!')
-        if click == 0:
+        if click == 0 and click_cfg is None:
             # Disable click interrupt.
             r = self._read_register_byte(REG_CTRL3)
             r &= ~(0x80)  # Turn off I1_CLICK.
@@ -175,7 +175,10 @@ class LIS3DH:
         # Else enable click with specified parameters.
         self._write_register_byte(REG_CTRL3, 0x80)  # Turn on int1 click.
         self._write_register_byte(REG_CTRL5, 0x08)  # Latch interrupt on int1.
-        if click == 1:
+        if click_cfg is not None:
+            # Custom click configuration register value specified, use it.
+            self._write_register_byte(REG_CLICKCFG, click_cfg)
+        elif click == 1:
             self._write_register_byte(REG_CLICKCFG, 0x15)  # Turn on all axes & singletap.
         elif click == 2:
             self._write_register_byte(REG_CLICKCFG, 0x2A)  # Turn on all axes & doubletap.
