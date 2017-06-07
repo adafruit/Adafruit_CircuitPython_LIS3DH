@@ -2,6 +2,7 @@
 # This is meant to work with the Circuit Playground Express board:
 #   https://www.adafruit.com/product/3333
 # Needs this LIS3DH module and the NeoPixel module installed:
+#   https://github.com/adafruit/Adafruit_CircuitPython_LIS3DH
 #   https://github.com/adafruit/Adafruit_CircuitPython_NeoPixel
 # Author: Tony DiCola
 # License: MIT License (https://opensource.org/licenses/MIT)
