@@ -168,9 +168,9 @@ pixels.write()
 
 # Initialize buttons.
 button_a = digitalio.DigitalInOut(board.BUTTON_A)
-button_a.switch_to_input(pull=digitalio.DigitalInOut.Pull.DOWN)
+button_a.switch_to_input(pull=digitalio.Pull.DOWN)
 button_b = digitalio.DigitalInOut(board.BUTTON_B)
-button_b.switch_to_input(pull=digitalio.DigitalInOut.Pull.DOWN)
+button_b.switch_to_input(pull=digitalio.Pull.DOWN)
 
 # Initialize the LIS3DH accelerometer.
 # Note that this is specific to Circuit Playground Express boards.  For other
