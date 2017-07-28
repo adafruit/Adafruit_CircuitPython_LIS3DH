@@ -131,7 +131,7 @@ class DiscreteDotAnimation:
         for i in range(self._dots):
             pos = int(position + i*self._dot_offset) % self._pixels.n
             self._pixels[pos] = primary
-        self._pixels.write()
+        self._pixels.show()
 
 class SmoothAnimation:
 
@@ -158,13 +158,13 @@ class SmoothAnimation:
         for i in range(self._pixels.n):
             x = math.sin(self._sin_scale*i - phase)
             self._pixels[i] = color_lerp(x, -1.0, 1.0, primary, secondary)
-        self._pixels.write()
+        self._pixels.show()
 
 
 # Initialize and turn off NeoPixels.
-pixels = neopixel.NeoPixel(board.NEOPIXEL, 10)
+pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, auto_write=False)
 pixels.fill((0,0,0))
-pixels.write()
+pixels.show()
 
 # Initialize buttons.
 button_a = digitalio.DigitalInOut(board.BUTTON_A)
