@@ -55,9 +55,9 @@ class FidgetSpinner:
 
 
 # Initialize NeoPixels and accelerometer.
-pixels = neopixel.NeoPixel(board.NEOPIXEL, 10)
+pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, auto_write=False)
 pixels.fill((0,0,0))
-pixels.write()
+pixels.show()
 i2c = busio.I2C(board.ACCELEROMETER_SCL, board.ACCELEROMETER_SDA)
 lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, address=25)
 
@@ -111,6 +111,6 @@ while True:
     # pixels ahead, wrapping back to the start) to the primary color.
     pixels[pos] = PRIMARY_COLOR
     pixels[(pos + 5) % 10] = PRIMARY_COLOR
-    pixels.write()
+    pixels.show()
     # Small delay to stay responsive but give time for interrupt processing.
     time.sleep(0.05)
