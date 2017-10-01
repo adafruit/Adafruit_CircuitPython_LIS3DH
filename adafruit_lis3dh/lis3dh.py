@@ -5,7 +5,7 @@ struct# Adafruit LIS3DH Accelerometer CircuitPython Driver
 # License: MIT License (https://en.wikipedia.org/wiki/MIT_License)
 try:
     import struct
-else:
+except:
     import ustruct as struct
 
 from micropython import const
