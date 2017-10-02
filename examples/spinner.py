@@ -8,7 +8,6 @@
 # License: MIT License (https://opensource.org/licenses/MIT)
 import math
 import time
-import ustruct
 
 import board
 import busio
