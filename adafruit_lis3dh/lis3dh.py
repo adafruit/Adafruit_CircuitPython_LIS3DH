@@ -1,4 +1,4 @@
-struct# Adafruit LIS3DH Accelerometer CircuitPython Driver
+# Adafruit LIS3DH Accelerometer CircuitPython Driver
 # Based on the Arduino LIS3DH driver from:
 #   https://github.com/adafruit/Adafruit_LIS3DH/
 # Author: Tony DiCola
