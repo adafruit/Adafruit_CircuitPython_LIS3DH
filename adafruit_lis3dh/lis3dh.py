@@ -5,7 +5,7 @@
 # License: MIT License (https://en.wikipedia.org/wiki/MIT_License)
 try:
     import struct
-except:
+except ImportError:
     import ustruct as struct
 
 from micropython import const
