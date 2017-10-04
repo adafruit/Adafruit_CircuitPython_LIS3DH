@@ -99,9 +99,9 @@ class LIS3DH:
         a 3-tuple and are in m / s ^ 2.
         """
         data = self._read_register(REG_OUT_X_L | 0x80, 6)
-        x = struct.unpack('<h', data[0:2])[0]
-        y = struct.unpack('<h', data[2:4])[0]
-        z = struct.unpack('<h', data[4:6])[0]
+        x = struct.unpack('<h', data)[0]
+        y = struct.unpack_from('<h', data,2)[0]
+        z = struct.unpack_from('<h', data,4)[0]
         divider = 1
         accel_range = self.range
         if accel_range == RANGE_16_G:
@@ -121,7 +121,8 @@ class LIS3DH:
         if adc < 1 or adc > 3:
             raise ValueError('ADC must be a value 1 to 3!')
         data = self._read_register((REG_OUTADC1_L+((adc-1)*2)) | 0x80, 2)
-        return struct.unpack('<h', data[0:2])[0]
+        print(data)
+        return struct.unpack('<h', data)[0]
 
     def read_adc_mV(self, adc):
         """Read the specified analog to digital converter value in millivolts.
