@@ -98,10 +98,6 @@ class LIS3DH:
         """Read the x, y, z acceleration values.  These values are returned in
         a 3-tuple and are in m / s ^ 2.
         """
-        data = self._read_register(REG_OUT_X_L | 0x80, 6)
-        x = struct.unpack('<h', data)[0]
-        y = struct.unpack_from('<h', data,2)[0]
-        z = struct.unpack_from('<h', data,4)[0]
         divider = 1
         accel_range = self.range
         if accel_range == RANGE_16_G:
@@ -112,7 +108,9 @@ class LIS3DH:
             divider = 8190
         elif accel_range == RANGE_2_G:
             divider = 16380
-        return (x / divider * 9.806, y / divider * 9.806, z / divider * 9.806)
+
+        xyz = struct.unpack('<hhh', self._read_register(REG_OUT_X_L | 0x80, 6))
+        return (xyz[0] / divider * 9.806, xyz[1] / divider * 9.806, xyz[2] / divider * 9.806)
 
     def read_adc_raw(self, adc):
         """Retrieve the raw analog to digital converter value.  ADC must be a
@@ -120,9 +118,8 @@ class LIS3DH:
         """
         if adc < 1 or adc > 3:
             raise ValueError('ADC must be a value 1 to 3!')
-        data = self._read_register((REG_OUTADC1_L+((adc-1)*2)) | 0x80, 2)
-        print(data)
-        return struct.unpack('<h', data)[0]
+
+        return struct.unpack('<h', self._read_register((REG_OUTADC1_L+((adc-1)*2)) | 0x80, 2))[0]
 
     def read_adc_mV(self, adc):
         """Read the specified analog to digital converter value in millivolts.
