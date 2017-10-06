@@ -109,8 +109,9 @@ class LIS3DH:
         elif accel_range == RANGE_2_G:
             divider = 16380
 
-        xyz = struct.unpack('<hhh', self._read_register(REG_OUT_X_L | 0x80, 6))
-        return (xyz[0] / divider * 9.806, xyz[1] / divider * 9.806, xyz[2] / divider * 9.806)
+        x, y, z = struct.unpack('<hhh', self._read_register(REG_OUT_X_L | 0x80, 6))
+        
+        return (x / divider * 9.806, y / divider * 9.806, z / divider * 9.806)
 
     def read_adc_raw(self, adc):
         """Retrieve the raw analog to digital converter value.  ADC must be a
