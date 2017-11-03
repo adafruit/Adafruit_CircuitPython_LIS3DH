@@ -110,7 +110,7 @@ class LIS3DH:
             divider = 16380
 
         x, y, z = struct.unpack('<hhh', self._read_register(REG_OUT_X_L | 0x80, 6))
-        
+
         return (x / divider * 9.806, y / divider * 9.806, z / divider * 9.806)
 
     def read_adc_raw(self, adc):
@@ -217,7 +217,7 @@ class LIS3DH_I2C(LIS3DH):
         self._buffer[0] = register & 0xFF
         with self._i2c as i2c:
             i2c.write(self._buffer, start=0, end=1)
-            i2c.read_into(self._buffer, start=0, end=length)
+            i2c.readinto(self._buffer, start=0, end=length)
             return self._buffer
 
     def _write_register_byte(self, register, value):
