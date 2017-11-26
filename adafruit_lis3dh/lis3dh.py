@@ -9,6 +9,8 @@ except ImportError:
     import ustruct as struct
 
 from micropython import const
+import time
+import math
 
 # Register addresses:
 REG_OUTADC1_L   = const(0x08)
@@ -112,6 +114,34 @@ class LIS3DH:
         x, y, z = struct.unpack('<hhh', self._read_register(REG_OUT_X_L | 0x80, 6))
 
         return (x / divider * 9.806, y / divider * 9.806, z / divider * 9.806)
+
+    def shake(self, shake_threshold=30, avg_delay=0.01, avg_count=10):
+        """Detect when the accelerometer is shaken. This takes a series of readings
+        from acceleration, finds the average, then calculates the total acceleration
+        by taking the square root of the sum of squares, i.e. sqrt(X*X + Y*Y + Z*Z).
+        The result is compared to a threshold to determine if the device has been
+        shaken.
+        Optional parameters:
+         shake_threshold - Increase or decrease to change shake sensitivity. This
+                           requires a minimum value of 10. 10 is the total
+                           acceleration if the board is not moving, therefore
+                           anything less than 10 will erroneously report a constant
+                           shake detected. (Default 30)
+         avg_delay - The speed in seconds at which the series of values used for the
+                     average acceleration are taken. (Default 0.01)
+         avg_count - The number of readings taken and used for the average
+                     acceleration. (Default 10)
+         """
+        shake_accel = (0, 0, 0)
+        for i in range(avg_count):
+            shake_accel = tuple(map(sum, zip(shake_accel, self.acceleration)))
+            time.sleep(avg_delay)
+        avg = tuple(value / avg_count for value in shake_accel)
+        total_accel = math.sqrt(sum(map(lambda x: x * x, avg)))
+        if total_accel > shake_threshold:
+            return True
+        else:
+            return False
 
     def read_adc_raw(self, adc):
         """Retrieve the raw analog to digital converter value.  ADC must be a
