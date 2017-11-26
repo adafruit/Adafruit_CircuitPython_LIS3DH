@@ -138,10 +138,7 @@ class LIS3DH:
             time.sleep(avg_delay)
         avg = tuple(value / avg_count for value in shake_accel)
         total_accel = math.sqrt(sum(map(lambda x: x * x, avg)))
-        if total_accel > shake_threshold:
-            return True
-        else:
-            return False
+        return total_accel > shake_threshold
 
     def read_adc_raw(self, adc):
         """Retrieve the raw analog to digital converter value.  ADC must be a
