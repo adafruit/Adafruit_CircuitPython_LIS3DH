@@ -116,14 +116,7 @@ class LIS3DH:
         return (x / divider * 9.806, y / divider * 9.806, z / divider * 9.806)
 
     def shake(self, shake_threshold=30, avg_count=10, total_delay=0.1):
-        """Detect when the accelerometer is shaken. shake_accel creates a list of
-        avg_count tuples, and adds each set of tuple members together, returning
-        a single tuple. avg takes that result and divides each member of that
-        tuple by avg_count to get the average of the data. Then total_accel
-        calculates the total acceleration by taking the square root of the sum of
-        the squares, i.e. sqrt(X*X + Y*Y + Z*Z). total_accel is compared to the
-        shake_threshold to determine if the device has been shaken.
-        Optional parameters:
+        """Detect when the accelerometer is shaken. Optional parameters:
          shake_threshold - Increase or decrease to change shake sensitivity. This
                            requires a minimum value of 10. 10 is the total
                            acceleration if the board is not moving, therefore
@@ -136,6 +129,13 @@ class LIS3DH:
          """
         shake_accel = (0, 0, 0)
         for i in range(avg_count):
+            # shake_accel creates a list of tuples from acceleration data.
+            # zip takes multiple tuples and zips them together, as in:
+            # In : zip([-0.2, 0.0, 9.5], [37.9, 13.5, -72.8])
+            # Out: [(-0.2, 37.9), (0.0, 13.5), (9.5, -72.8)]
+            # map applies sum to each member of this tuple, resulting in a
+            # 3-member list. tuple converts this list into a tuple which is
+            # used as shake_accel.
             shake_accel = tuple(map(sum, zip(shake_accel, self.acceleration)))
             time.sleep(total_delay / avg_count)
         avg = tuple(value / avg_count for value in shake_accel)
