@@ -115,27 +115,29 @@ class LIS3DH:
 
         return (x / divider * 9.806, y / divider * 9.806, z / divider * 9.806)
 
-    def shake(self, shake_threshold=30, avg_delay=0.01, avg_count=10):
-        """Detect when the accelerometer is shaken. This takes a series of readings
-        from acceleration, finds the average, then calculates the total acceleration
-        by taking the square root of the sum of squares, i.e. sqrt(X*X + Y*Y + Z*Z).
-        The result is compared to a threshold to determine if the device has been
-        shaken.
+    def shake(self, shake_threshold=30, avg_count=10, total_delay=0.1):
+        """Detect when the accelerometer is shaken. shake_accel creates a list of
+        avg_count tuples, and adds each set of tuple members together, returning
+        a single tuple. avg takes that result and divides each member of that
+        tuple by avg_count to get the average of the data. Then total_accel
+        calculates the total acceleration by taking the square root of the sum of
+        the squares, i.e. sqrt(X*X + Y*Y + Z*Z). total_accel is compared to the
+        shake_threshold to determine if the device has been shaken.
         Optional parameters:
          shake_threshold - Increase or decrease to change shake sensitivity. This
                            requires a minimum value of 10. 10 is the total
                            acceleration if the board is not moving, therefore
                            anything less than 10 will erroneously report a constant
                            shake detected. (Default 30)
-         avg_delay - The speed in seconds at which the series of values used for the
-                     average acceleration are taken. (Default 0.01)
          avg_count - The number of readings taken and used for the average
                      acceleration. (Default 10)
+         total_delay - The total time in seconds it takes to obtain avg_count
+                       readings from acceleration. (Default 0.1)
          """
         shake_accel = (0, 0, 0)
         for i in range(avg_count):
             shake_accel = tuple(map(sum, zip(shake_accel, self.acceleration)))
-            time.sleep(avg_delay)
+            time.sleep(total_delay / avg_count)
         avg = tuple(value / avg_count for value in shake_accel)
         total_accel = math.sqrt(sum(map(lambda x: x * x, avg)))
         return total_accel > shake_threshold
