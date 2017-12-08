@@ -3,16 +3,31 @@
 #   https://github.com/adafruit/Adafruit_LIS3DH/
 # Author: Tony DiCola
 # License: MIT License (https://en.wikipedia.org/wiki/MIT_License)
+"""
+`adafruit_lis3dh`
+====================================================
+
+CircuitPython driver for the LIS3DH accelerometer.
+
+See examples in the examples directory.
+
+* Author(s): Tony DiCola
+"""
+
+import time
+import math
 try:
     import struct
 except ImportError:
     import ustruct as struct
 
 from micropython import const
-import time
-import math
+
+__version__ = "0.0.0-auto.0"
+__repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_LIS3DH.git"
 
 # Register addresses:
+# pylint: disable=bad-whitespace
 REG_OUTADC1_L   = const(0x08)
 REG_WHOAMI      = const(0x0F)
 REG_TEMPCFG     = const(0x1F)
@@ -43,10 +58,11 @@ DATARATE_1_HZ            = const(0b0001)  # 1 Hz
 DATARATE_POWERDOWN       = const(0)
 DATARATE_LOWPOWER_1K6HZ  = const(0b1000)
 DATARATE_LOWPOWER_5KHZ   = const(0b1001)
+# pylint: enable=bad-whitespace
 
 
 class LIS3DH:
-
+    """Driver base for the LIS3DH accelerometer."""
     def __init__(self):
         # Check device ID.
         device_id = self._read_register_byte(REG_WHOAMI)
@@ -97,9 +113,7 @@ class LIS3DH:
 
     @property
     def acceleration(self):
-        """Read the x, y, z acceleration values.  These values are returned in
-        a 3-tuple and are in m / s ^ 2.
-        """
+        """The x, y, z acceleration values returned in a 3-tuple and are in m / s ^ 2."""
         divider = 1
         accel_range = self.range
         if accel_range == RANGE_16_G:
@@ -128,7 +142,7 @@ class LIS3DH:
                        readings from acceleration. (Default 0.1)
          """
         shake_accel = (0, 0, 0)
-        for i in range(avg_count):
+        for _ in range(avg_count):
             # shake_accel creates a list of tuples from acceleration data.
             # zip takes multiple tuples and zips them together, as in:
             # In : zip([-0.2, 0.0, 9.5], [37.9, 13.5, -72.8])
@@ -151,7 +165,7 @@ class LIS3DH:
 
         return struct.unpack('<h', self._read_register((REG_OUTADC1_L+((adc-1)*2)) | 0x80, 2))[0]
 
-    def read_adc_mV(self, adc):
+    def read_adc_mV(self, adc): # pylint: disable=invalid-name
         """Read the specified analog to digital converter value in millivolts.
         ADC must be a value 1, 2, or 3.  NOTE the ADC can only measure voltages
         in the range of ~900-1200mV!
@@ -181,7 +195,8 @@ class LIS3DH:
         raw = self.read_click_raw()
         return (raw & 0x10 > 0, raw & 0x20 > 0)
 
-    def set_click(self, click, threshold, time_limit=10, time_latency=20, time_window=255, click_cfg=None):
+    def set_click(self, click, threshold, *,
+                  time_limit=10, time_latency=20, time_window=255, click_cfg=None):
         """Set the click detection parameters.  Must specify at least:
             click - Set to 0 to disable click detection, 1 to detect only single
                     clicks, and 2 to detect single & double clicks.
@@ -235,6 +250,7 @@ class LIS3DH:
 
 
 class LIS3DH_I2C(LIS3DH):
+    """Driver for the LIS3DH accelerometer connected over I2C."""
 
     def __init__(self, i2c, address=0x18):
         import adafruit_bus_device.i2c_device as i2c_device
@@ -257,6 +273,7 @@ class LIS3DH_I2C(LIS3DH):
 
 
 class LIS3DH_SPI(LIS3DH):
+    """Driver for the LIS3DH accelerometer connected over SPI."""
 
     def __init__(self, spi, cs, baudrate=100000):
         import adafruit_bus_device.spi_device as spi_device

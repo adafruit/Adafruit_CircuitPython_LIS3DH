@@ -6,6 +6,7 @@
 #   https://github.com/adafruit/Adafruit_CircuitPython_NeoPixel
 # Author: Tony DiCola
 # License: MIT License (https://opensource.org/licenses/MIT)
+# pylint: disable=redefined-outer-name
 import math
 import time
 
@@ -17,7 +18,7 @@ import neopixel
 
 
 # Configuration:
-ACCEL_RANGE   = adafruit_lis3dh.RANGE_16_G  # Accelerometer range.
+ACCEL_RANGE = adafruit_lis3dh.RANGE_16_G  # Accelerometer range.
 TAP_THRESHOLD = 20              # Accelerometer tap threshold.  Higher values
                                 # mean you need to tap harder to start a spin.
 SPINNER_DECAY = 0.5             # Decay rate for the spinner.  Set to a value
@@ -55,7 +56,7 @@ class FidgetSpinner:
 
 # Initialize NeoPixels and accelerometer.
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, auto_write=False)
-pixels.fill((0,0,0))
+pixels.fill((0, 0, 0))
 pixels.show()
 i2c = busio.I2C(board.ACCELEROMETER_SCL, board.ACCELEROMETER_SDA)
 lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, address=25)
@@ -69,8 +70,10 @@ lis3dh.set_click(1, TAP_THRESHOLD, click_cfg=0x01)
 # call internal methods that change a few register values.  This must be done
 # AFTER calling set_click above because the set_click function also changes
 # REG_CTRL5.
+# pylint: disable=protected-access
 lis3dh._write_register_byte(adafruit_lis3dh.REG_CTRL5, 0b01001000)
 lis3dh._write_register_byte(0x2E, 0b10000000)  # Set FIFO_CTRL to Stream mode.
+# pylint: disable=protected-access
 
 # Create a fidget spinner object.
 spinner = FidgetSpinner(SPINNER_DECAY)
