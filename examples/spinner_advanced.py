@@ -12,6 +12,7 @@
 #   https://github.com/adafruit/Adafruit_CircuitPython_NeoPixel
 # Author: Tony DiCola
 # License: MIT License (https://opensource.org/licenses/MIT)
+# pylint: disable=redefined-outer-name
 import math
 import time
 
@@ -24,7 +25,7 @@ import neopixel
 
 
 # Configuration:
-ACCEL_RANGE   = adafruit_lis3dh.RANGE_16_G  # Accelerometer range.
+ACCEL_RANGE = adafruit_lis3dh.RANGE_16_G  # Accelerometer range.
 TAP_THRESHOLD = 20              # Accelerometer tap threshold.  Higher values
                                 # mean you need to tap harder to start a spin.
 SPINNER_DECAY = 0.5             # Decay rate for the spinner.  Set to a value
@@ -162,7 +163,7 @@ class SmoothAnimation:
 
 # Initialize and turn off NeoPixels.
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, auto_write=False)
-pixels.fill((0,0,0))
+pixels.fill((0, 0, 0))
 pixels.show()
 
 # Initialize buttons.
@@ -190,8 +191,10 @@ lis3dh.set_click(1, TAP_THRESHOLD, click_cfg=0x01)
 # readings in a FIFO buffer so they can be read later to see a history of
 # recent acceleration.  This is handy to look for the maximum/minimum impulse
 # after a click is detected.
+# pylint: disable=protected-access
 lis3dh._write_register_byte(adafruit_lis3dh.REG_CTRL5, 0b01001000)
 lis3dh._write_register_byte(0x2E, 0b10000000)  # Set FIFO_CTRL to Stream mode.
+# pylint: disable=protected-access
 
 # Create a fidget spinner object.
 spinner = FidgetSpinner(SPINNER_DECAY)
