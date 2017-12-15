@@ -81,11 +81,10 @@ class LIS3DH:
 
     @property
     def data_rate(self):
-        """Get/set the data rate of the accelerometer.  Can be DATA_RATE_400_HZ,
-        DATA_RATE_200_HZ, DATA_RATE_100_HZ, DATA_RATE_50_HZ, DATA_RATE_25_HZ,
-        DATA_RATE_10_HZ, DATA_RATE_1_HZ, DATA_RATE_POWERDOWN, DATA_RATE_LOWPOWER_1K6HZ,
-        or DATA_RATE_LOWPOWER_5KHZ.
-        """
+        """The data rate of the accelerometer.  Can be DATA_RATE_400_HZ, DATA_RATE_200_HZ,
+           DATA_RATE_100_HZ, DATA_RATE_50_HZ, DATA_RATE_25_HZ, DATA_RATE_10_HZ,
+           DATA_RATE_1_HZ, DATA_RATE_POWERDOWN, DATA_RATE_LOWPOWER_1K6HZ, or
+           DATA_RATE_LOWPOWER_5KHZ."""
         ctl1 = self._read_register_byte(REG_CTRL1)
         return (ctl1 >> 4) & 0x0F
 
@@ -98,9 +97,8 @@ class LIS3DH:
 
     @property
     def range(self):
-        """Get/set the range of the accelerometer.  Can be RANGE_2_G, RANGE_4_G,
-        RANGE_8_G, or RANGE_16_G.
-        """
+        """The range of the accelerometer.  Can be RANGE_2_G, RANGE_4_G, RANGE_8_G, or
+           RANGE_16_G."""
         ctl4 = self._read_register_byte(REG_CTRL4)
         return (ctl4 >> 4) & 0x03
 
@@ -183,35 +181,35 @@ class LIS3DH:
         #   y1 = 900
         return 1800+(raw+32512)*(-900/65024)
 
-    def read_click_raw(self):
-        """Read the raw click register byte value."""
-        return self._read_register_byte(REG_CLICKSRC)
+    @property
+    def tapped(self):
+        """True if a tap was detected recently. Whether its a single tap or double tap is
+           determined by the tap param on `set_tap`. This may be True over multiple reads
+           even if only a single tap or single double tap occurred."""
+        raw = self._read_register_byte(REG_CLICKSRC)
+        return raw & 0x40 > 0
 
-    def read_click(self):
-        """Read a 2-tuple of bools where the first value is True if a single
-        click was detected and the second value is True if a double click was
-        detected.
-        """
-        raw = self.read_click_raw()
-        return (raw & 0x10 > 0, raw & 0x20 > 0)
+    def set_tap(self, tap, threshold, *,
+                time_limit=10, time_latency=20, time_window=255, click_cfg=None):
+        """Set the tap detection parameters.
 
-    def set_click(self, click, threshold, *,
-                  time_limit=10, time_latency=20, time_window=255, click_cfg=None):
-        """Set the click detection parameters.  Must specify at least:
-            click - Set to 0 to disable click detection, 1 to detect only single
-                    clicks, and 2 to detect single & double clicks.
-            threshold - A threshold for the click detection.  The higher the value
-                        the less sensitive the detection.  This changes based on
-                        the accelerometer range.  Good values are 5-10 for 16G,
-                        10-20 for 8G, 20-40 for 4G, and 40-80 for 2G.
-          Optionally specify (see datasheet for meaning of these):
-            time_limit - Time limit register value (default 10).
-            time_latency - Time latency register value (default 20).
-            time_window - Time window register value (default 255).
-        """
-        if (click < 0 or click > 2) and click_cfg is None:
-            raise ValueError('Click must be 0 (disabled), 1 (single click), or 2 (double click)!')
-        if click == 0 and click_cfg is None:
+           .. note:: Tap related registers are called CLICK_ in the datasheet.
+
+            :param int tap: 0 to disable tap detection, 1 to detect only single
+              taps, and 2 to detect only double taps.
+            :param int threshold: A threshold for the tap detection.  The higher the value
+              the less sensitive the detection.  This changes based on the accelerometer
+              range.  Good values are 5-10 for 16G, 10-20 for 8G, 20-40 for 4G, and 40-80 for
+              2G.
+            :param int time_limit: TIME_LIMIT register value (default 10).
+            :param int time_latency: TIME_LATENCY register value (default 20).
+            :param int time_window: TIME_WINDOW register value (default 255).
+            :param int click_cfg: CLICK_CFG register value."""
+        if (tap < 0 or tap > 2) and click_cfg is None:
+            raise ValueError('Tap must be 0 (disabled), 1 (single tap), or 2 (double tap)!')
+        if threshold > 127 or threshold < 0:
+            raise ValueError('Threshold out of range (0-127)')
+        if tap == 0 and click_cfg is None:
             # Disable click interrupt.
             r = self._read_register_byte(REG_CTRL3)
             r &= ~(0x80)  # Turn off I1_CLICK.
@@ -224,9 +222,9 @@ class LIS3DH:
         if click_cfg is not None:
             # Custom click configuration register value specified, use it.
             self._write_register_byte(REG_CLICKCFG, click_cfg)
-        elif click == 1:
+        elif tap == 1:
             self._write_register_byte(REG_CLICKCFG, 0x15)  # Turn on all axes & singletap.
-        elif click == 2:
+        elif tap == 2:
             self._write_register_byte(REG_CLICKCFG, 0x2A)  # Turn on all axes & doubletap.
         self._write_register_byte(REG_CLICKTHS, threshold)
         self._write_register_byte(REG_TIMELIMIT, time_limit)

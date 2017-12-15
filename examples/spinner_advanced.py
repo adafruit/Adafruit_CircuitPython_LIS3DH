@@ -183,10 +183,10 @@ lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, address=25)
 lis3dh.range = ACCEL_RANGE
 # Enable single click detection, but use a custom CLICK_CFG register value
 # to only detect clicks on the X axis (instead of all 3 X, Y, Z axes).
-lis3dh.set_click(1, TAP_THRESHOLD, click_cfg=0x01)
+lis3dh.set_tap(1, TAP_THRESHOLD, click_cfg=0x01)
 # Enable LIS3DH FIFO in stream mode.  This reaches in to the LIS3DH library to
 # call internal methods that change a few register values.  This must be done
-# AFTER calling set_click above because the set_click function also changes
+# AFTER calling set_tap above because the set_tap function also changes
 # REG_CTRL5.  The FIFO stream mode will keep track of the 32 last X,Y,Z accel
 # readings in a FIFO buffer so they can be read later to see a history of
 # recent acceleration.  This is handy to look for the maximum/minimum impulse
@@ -219,7 +219,7 @@ while True:
     # Read the raw click detection register value and check if there was
     # a click detected.  Remember only the X axis causes clicks because of
     # the register configuration set previously.
-    clicksrc = lis3dh.read_click_raw()
+    clicksrc = lis3dh._read_register_byte(adafruit_lis3dh.REG_CLICKSRC) # pylint: disable=protected-access
     if clicksrc & 0b01000000 > 0:
         # Click was detected!  Quickly read 32 values from the accelerometer
         # and look for the maximum magnitude values.  Because the
