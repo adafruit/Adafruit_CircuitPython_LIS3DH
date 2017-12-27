@@ -226,7 +226,7 @@ class LIS3DH:
             self._write_register_byte(REG_CLICKCFG, 0x15)  # Turn on all axes & singletap.
         elif tap == 2:
             self._write_register_byte(REG_CLICKCFG, 0x2A)  # Turn on all axes & doubletap.
-        self._write_register_byte(REG_CLICKTHS, threshold)
+        self._write_register_byte(REG_CLICKTHS, threshold | 0x80)
         self._write_register_byte(REG_TIMELIMIT, time_limit)
         self._write_register_byte(REG_TIMELATENCY, time_latency)
         self._write_register_byte(REG_TIMEWINDOW, time_window)
