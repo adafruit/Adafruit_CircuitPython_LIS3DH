@@ -190,9 +190,23 @@ class LIS3DH:
     @property
     def tapped(self):
         """True if a tap was detected recently. Whether its a single tap or double tap is
-           determined by the tap param on `set_tap`. `tapped` may be True over multiple reads
-           even if only a single tap or single double tap occurred if the interrupt (int)
-           pin is not specified."""
+           determined by the tap param on ``set_tap``. ``tapped`` may be True over
+           multiple reads even if only a single tap or single double tap occurred if the
+           interrupt (int) pin is not specified.
+
+           The following example uses ``i2c`` and specifies the interrupt pin:
+
+           .. code-block:: python
+
+             import adafruit_lis3dh
+             import digitalio
+
+             i2c = busio.I2C(board.SCL, board.SDA)
+             int1 = digitalio.DigitalInOut(board.D11) # pin connected to interrupt
+             lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, int1=int1)
+             lis3dh.range = adafruit_lis3dh.RANGE_8_G
+
+           """
         if self._int1 and not self._int1.value:
             return False
         raw = self._read_register_byte(REG_CLICKSRC)
