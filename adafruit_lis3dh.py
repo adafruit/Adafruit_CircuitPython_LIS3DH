@@ -16,6 +16,7 @@ See examples in the examples directory.
 
 import time
 import math
+import digitalio
 try:
     import struct
 except ImportError:
@@ -36,6 +37,7 @@ REG_CTRL3       = const(0x22)
 REG_CTRL4       = const(0x23)
 REG_CTRL5       = const(0x24)
 REG_OUT_X_L     = const(0x28)
+REG_INT1SRC     = const(0x31)
 REG_CLICKCFG    = const(0x38)
 REG_CLICKSRC    = const(0x39)
 REG_CLICKTHS    = const(0x3A)
@@ -48,6 +50,7 @@ RANGE_16_G               = const(0b11)    # +/- 16g
 RANGE_8_G                = const(0b10)    # +/- 8g
 RANGE_4_G                = const(0b01)    # +/- 4g
 RANGE_2_G                = const(0b00)    # +/- 2g (default value)
+DATARATE_1344_HZ         = const(0b1001)  # 1.344 KHz
 DATARATE_400_HZ          = const(0b0111)  # 400Hz
 DATARATE_200_HZ          = const(0b0110)  # 200Hz
 DATARATE_100_HZ          = const(0b0101)  # 100Hz
@@ -63,21 +66,31 @@ DATARATE_LOWPOWER_5KHZ   = const(0b1001)
 
 class LIS3DH:
     """Driver base for the LIS3DH accelerometer."""
-    def __init__(self):
+    def __init__(self, int1=None, int2=None):
         # Check device ID.
         device_id = self._read_register_byte(REG_WHOAMI)
         if device_id != 0x33:
             raise RuntimeError('Failed to find LIS3DH!')
+        # Reboot
+        self._write_register_byte(REG_CTRL5, 0x80)
+        time.sleep(0.01)  # takes 5ms
         # Enable all axes, normal mode.
         self._write_register_byte(REG_CTRL1, 0x07)
         # Set 400Hz data rate.
         self.data_rate = DATARATE_400_HZ
         # High res & BDU enabled.
         self._write_register_byte(REG_CTRL4, 0x88)
-        # DRDY on INT1.
-        self._write_register_byte(REG_CTRL3, 0x10)
         # Enable ADCs.
         self._write_register_byte(REG_TEMPCFG, 0x80)
+        # Latch interrupt for INT1
+        self._write_register_byte(REG_CTRL5, 0x08)
+
+        # Initialise interrupt pins
+        self._int1 = int1
+        self._int2 = int2
+        if self._int1:
+            self._int1.direction = digitalio.Direction.INPUT
+            self._int1.pull = digitalio.Pull.UP
 
     @property
     def data_rate(self):
@@ -105,7 +118,7 @@ class LIS3DH:
     @range.setter
     def range(self, range_value):
         ctl4 = self._read_register_byte(REG_CTRL4)
-        ctl4 &= ~(0x30)
+        ctl4 &= ~0x30
         ctl4 |= range_value << 4
         self._write_register_byte(REG_CTRL4, ctl4)
 
@@ -125,7 +138,7 @@ class LIS3DH:
 
         x, y, z = struct.unpack('<hhh', self._read_register(REG_OUT_X_L | 0x80, 6))
 
-        return (x / divider * 9.806, y / divider * 9.806, z / divider * 9.806)
+        return x / divider * 9.806, y / divider * 9.806, z / divider * 9.806
 
     def shake(self, shake_threshold=30, avg_count=10, total_delay=0.1):
         """Detect when the accelerometer is shaken. Optional parameters:
@@ -184,8 +197,25 @@ class LIS3DH:
     @property
     def tapped(self):
         """True if a tap was detected recently. Whether its a single tap or double tap is
-           determined by the tap param on `set_tap`. This may be True over multiple reads
-           even if only a single tap or single double tap occurred."""
+           determined by the tap param on ``set_tap``. ``tapped`` may be True over
+           multiple reads even if only a single tap or single double tap occurred if the
+           interrupt (int) pin is not specified.
+
+           The following example uses ``i2c`` and specifies the interrupt pin:
+
+           .. code-block:: python
+
+             import adafruit_lis3dh
+             import digitalio
+
+             i2c = busio.I2C(board.SCL, board.SDA)
+             int1 = digitalio.DigitalInOut(board.D11) # pin connected to interrupt
+             lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, int1=int1)
+             lis3dh.range = adafruit_lis3dh.RANGE_8_G
+
+           """
+        if self._int1 and not self._int1.value:
+            return False
         raw = self._read_register_byte(REG_CLICKSRC)
         return raw & 0x40 > 0
 
@@ -209,24 +239,24 @@ class LIS3DH:
             raise ValueError('Tap must be 0 (disabled), 1 (single tap), or 2 (double tap)!')
         if threshold > 127 or threshold < 0:
             raise ValueError('Threshold out of range (0-127)')
+
+        ctrl3 = self._read_register_byte(REG_CTRL3)
         if tap == 0 and click_cfg is None:
             # Disable click interrupt.
-            r = self._read_register_byte(REG_CTRL3)
-            r &= ~(0x80)  # Turn off I1_CLICK.
-            self._write_register_byte(REG_CTRL3, r)
+            self._write_register_byte(REG_CTRL3, ctrl3 & ~(0x80))  # Turn off I1_CLICK.
             self._write_register_byte(REG_CLICKCFG, 0)
             return
-        # Else enable click with specified parameters.
-        self._write_register_byte(REG_CTRL3, 0x80)  # Turn on int1 click.
-        self._write_register_byte(REG_CTRL5, 0x08)  # Latch interrupt on int1.
-        if click_cfg is not None:
-            # Custom click configuration register value specified, use it.
-            self._write_register_byte(REG_CLICKCFG, click_cfg)
-        elif tap == 1:
-            self._write_register_byte(REG_CLICKCFG, 0x15)  # Turn on all axes & singletap.
-        elif tap == 2:
-            self._write_register_byte(REG_CLICKCFG, 0x2A)  # Turn on all axes & doubletap.
-        self._write_register_byte(REG_CLICKTHS, threshold | 0x80)
+        else:
+            self._write_register_byte(REG_CTRL3, ctrl3 | 0x80)  # Turn on int1 click output
+
+        if click_cfg is None:
+            if tap == 1:
+                click_cfg = 0x15  # Turn on all axes & singletap.
+            if tap == 2:
+                click_cfg = 0x2A  # Turn on all axes & doubletap.
+        # Or, if a custom click configuration register value specified, use it.
+        self._write_register_byte(REG_CLICKCFG, click_cfg)
+        self._write_register_byte(REG_CLICKTHS, 0x80 | threshold)
         self._write_register_byte(REG_TIMELIMIT, time_limit)
         self._write_register_byte(REG_TIMELATENCY, time_latency)
         self._write_register_byte(REG_TIMEWINDOW, time_window)
@@ -250,11 +280,11 @@ class LIS3DH:
 class LIS3DH_I2C(LIS3DH):
     """Driver for the LIS3DH accelerometer connected over I2C."""
 
-    def __init__(self, i2c, address=0x18):
+    def __init__(self, i2c, *, address=0x18, int1=None, int2=None):
         import adafruit_bus_device.i2c_device as i2c_device
         self._i2c = i2c_device.I2CDevice(i2c, address)
         self._buffer = bytearray(6)
-        super().__init__()
+        super().__init__(int1=int1, int2=int2)
 
     def _read_register(self, register, length):
         self._buffer[0] = register & 0xFF
@@ -273,11 +303,11 @@ class LIS3DH_I2C(LIS3DH):
 class LIS3DH_SPI(LIS3DH):
     """Driver for the LIS3DH accelerometer connected over SPI."""
 
-    def __init__(self, spi, cs, baudrate=100000):
+    def __init__(self, spi, cs, *, baudrate=100000, int1=None, int2=None):
         import adafruit_bus_device.spi_device as spi_device
         self._spi = spi_device.SPIDevice(spi, cs, baudrate=baudrate)
         self._buffer = bytearray(6)
-        super().__init__()
+        super().__init__(int1=int1, int2=int2)
 
     def _read_register(self, register, length):
         if length == 1:
