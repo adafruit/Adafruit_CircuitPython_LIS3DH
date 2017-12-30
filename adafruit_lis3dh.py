@@ -37,6 +37,7 @@ REG_CTRL3       = const(0x22)
 REG_CTRL4       = const(0x23)
 REG_CTRL5       = const(0x24)
 REG_OUT_X_L     = const(0x28)
+REG_INT1SRC     = const(0x31)
 REG_CLICKCFG    = const(0x38)
 REG_CLICKSRC    = const(0x39)
 REG_CLICKTHS    = const(0x3A)
@@ -49,6 +50,7 @@ RANGE_16_G               = const(0b11)    # +/- 16g
 RANGE_8_G                = const(0b10)    # +/- 8g
 RANGE_4_G                = const(0b01)    # +/- 4g
 RANGE_2_G                = const(0b00)    # +/- 2g (default value)
+DATARATE_1344_HZ         = const(0b1001)  # 1.344 KHz
 DATARATE_400_HZ          = const(0b0111)  # 400Hz
 DATARATE_200_HZ          = const(0b0110)  # 200Hz
 DATARATE_100_HZ          = const(0b0101)  # 100Hz
@@ -69,6 +71,9 @@ class LIS3DH:
         device_id = self._read_register_byte(REG_WHOAMI)
         if device_id != 0x33:
             raise RuntimeError('Failed to find LIS3DH!')
+        # Reboot
+        self._write_register_byte(REG_CTRL5, 0x80)
+        time.sleep(0.01)  # takes 5ms
         # Enable all axes, normal mode.
         self._write_register_byte(REG_CTRL1, 0x07)
         # Set 400Hz data rate.
@@ -77,13 +82,15 @@ class LIS3DH:
         self._write_register_byte(REG_CTRL4, 0x88)
         # Enable ADCs.
         self._write_register_byte(REG_TEMPCFG, 0x80)
+        # Latch interrupt for INT1
+        self._write_register_byte(REG_CTRL5, 0x08)
+
         # Initialise interrupt pins
         self._int1 = int1
         self._int2 = int2
         if self._int1:
             self._int1.direction = digitalio.Direction.INPUT
             self._int1.pull = digitalio.Pull.UP
-            self._write_register_byte(REG_CTRL3, 0x80)  # Turn on int1 click.
 
     @property
     def data_rate(self):
@@ -232,23 +239,24 @@ class LIS3DH:
             raise ValueError('Tap must be 0 (disabled), 1 (single tap), or 2 (double tap)!')
         if threshold > 127 or threshold < 0:
             raise ValueError('Threshold out of range (0-127)')
+
+        ctrl3 = self._read_register_byte(REG_CTRL3)
         if tap == 0 and click_cfg is None:
             # Disable click interrupt.
-            r = self._read_register_byte(REG_CTRL3)
-            r &= ~(0x80)  # Turn off I1_CLICK.
-            self._write_register_byte(REG_CTRL3, r)
+            self._write_register_byte(REG_CTRL3, ctrl3 & ~(0x80))  # Turn off I1_CLICK.
             self._write_register_byte(REG_CLICKCFG, 0)
             return
-        if click_cfg is not None:
-            # Custom click configuration register value specified, use it.
-            self._write_register_byte(REG_CLICKCFG, click_cfg)
-        elif tap == 1:
-            self._write_register_byte(REG_CLICKCFG, 0x15)  # Turn on all axes & singletap.
-        elif tap == 2:
-            self._write_register_byte(REG_CLICKCFG, 0x2A)  # Turn on all axes & doubletap.
-        if self._int1:
-            threshold |= 0x80 # latch click only if read with interrupt pin
-        self._write_register_byte(REG_CLICKTHS, threshold)
+        else:
+            self._write_register_byte(REG_CTRL3, ctrl3 | 0x80)  # Turn on int1 click output
+
+        if click_cfg is None:
+            if tap == 1:
+                click_cfg = 0x15  # Turn on all axes & singletap.
+            if tap == 2:
+                click_cfg = 0x2A  # Turn on all axes & doubletap.
+        # Or, if a custom click configuration register value specified, use it.
+        self._write_register_byte(REG_CLICKCFG, click_cfg)
+        self._write_register_byte(REG_CLICKTHS, 0x80 | threshold)
         self._write_register_byte(REG_TIMELIMIT, time_limit)
         self._write_register_byte(REG_TIMELATENCY, time_latency)
         self._write_register_byte(REG_TIMEWINDOW, time_window)
