@@ -61,6 +61,9 @@ DATARATE_1_HZ            = const(0b0001)  # 1 Hz
 DATARATE_POWERDOWN       = const(0)
 DATARATE_LOWPOWER_1K6HZ  = const(0b1000)
 DATARATE_LOWPOWER_5KHZ   = const(0b1001)
+
+# Other constants
+STANDARD_GRAVITY = 9.806
 # pylint: enable=bad-whitespace
 
 
@@ -138,7 +141,12 @@ class LIS3DH:
 
         x, y, z = struct.unpack('<hhh', self._read_register(REG_OUT_X_L | 0x80, 6))
 
-        return x / divider * 9.806, y / divider * 9.806, z / divider * 9.806
+        # convert from Gs to m / s ^ 2 and adjust for the range
+        x = (x / divider) * STANDARD_GRAVITY
+        y = (y / divider) * STANDARD_GRAVITY
+        z = (z / divider) * STANDARD_GRAVITY
+
+        return x, y, z
 
     def shake(self, shake_threshold=30, avg_count=10, total_delay=0.1):
         """Detect when the accelerometer is shaken. Optional parameters:
