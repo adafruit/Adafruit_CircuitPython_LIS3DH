@@ -253,7 +253,7 @@ class LIS3DH:
         """
         Set the tap detection parameters.
 
-        .. note:: Tap related registers are called CLICK_ in the datasheet.
+        .. note:: Tap related registers are called ``CLICK_`` in the datasheet.
 
         :param int tap: 0 to disable tap detection, 1 to detect only single
                         taps, and 2 to detect only double taps.
