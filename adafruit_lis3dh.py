@@ -167,13 +167,16 @@ class LIS3DH:
     def shake(self, shake_threshold=30, avg_count=10, total_delay=0.1):
         """
         Detect when the accelerometer is shaken. Optional parameters:
+
         :param shake_threshold: Increase or decrease to change shake sensitivity. This
                                 requires a minimum value of 10. 10 is the total
                                 acceleration if the board is not moving, therefore
                                 anything less than 10 will erroneously report a constant
                                 shake detected. (Default 30)
+
         :param avg_count: The number of readings taken and used for the average
                           acceleration. (Default 10)
+
         :param total_delay: The total time in seconds it takes to obtain avg_count
                             readings from acceleration. (Default 0.1)
          """
@@ -254,10 +257,12 @@ class LIS3DH:
 
         :param int tap: 0 to disable tap detection, 1 to detect only single
                         taps, and 2 to detect only double taps.
+
         :param int threshold: A threshold for the tap detection.  The higher the value
                               the less sensitive the detection.  This changes based on
                               the accelerometer range.  Good values are 5-10 for 16G,
                               10-20 for 8G, 20-40 for 4G, and 40-80 for 2G.
+
         :param int time_limit: TIME_LIMIT register value (default 10).
         :param int time_latency: TIME_LATENCY register value (default 20).
         :param int time_window: TIME_WINDOW register value (default 255).
