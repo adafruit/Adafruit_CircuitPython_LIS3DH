@@ -12,6 +12,22 @@ CircuitPython driver for the LIS3DH accelerometer.
 See examples in the examples directory.
 
 * Author(s): Tony DiCola
+
+Implementation Notes
+--------------------
+
+**Hardware:**
+
+* `Adafruit LIS3DH Triple-Axis Accelerometer Breakout
+  <https://www.adafruit.com/product/2809>`_
+
+* `Circuit Playground Express <https://www.adafruit.com/product/3333>`_
+
+**Software and Dependencies:**
+
+* Adafruit CircuitPython firmware for the ESP8622 and M0-based boards:
+  https://github.com/adafruit/circuitpython/releases
+* Adafruit's Bus Device library: https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
 """
 
 import time
