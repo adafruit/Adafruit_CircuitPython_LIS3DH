@@ -12,6 +12,22 @@ CircuitPython driver for the LIS3DH accelerometer.
 See examples in the examples directory.
 
 * Author(s): Tony DiCola
+
+Implementation Notes
+--------------------
+
+**Hardware:**
+
+* `Adafruit LIS3DH Triple-Axis Accelerometer Breakout
+  <https://www.adafruit.com/product/2809>`_
+
+* `Circuit Playground Express <https://www.adafruit.com/product/3333>`_
+
+**Software and Dependencies:**
+
+* Adafruit CircuitPython firmware for the ESP8622 and M0-based boards:
+  https://github.com/adafruit/circuitpython/releases
+* Adafruit's Bus Device library: https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
 """
 
 import time
@@ -149,16 +165,20 @@ class LIS3DH:
         return x, y, z
 
     def shake(self, shake_threshold=30, avg_count=10, total_delay=0.1):
-        """Detect when the accelerometer is shaken. Optional parameters:
-         shake_threshold - Increase or decrease to change shake sensitivity. This
-                           requires a minimum value of 10. 10 is the total
-                           acceleration if the board is not moving, therefore
-                           anything less than 10 will erroneously report a constant
-                           shake detected. (Default 30)
-         avg_count - The number of readings taken and used for the average
-                     acceleration. (Default 10)
-         total_delay - The total time in seconds it takes to obtain avg_count
-                       readings from acceleration. (Default 0.1)
+        """
+        Detect when the accelerometer is shaken. Optional parameters:
+
+        :param shake_threshold: Increase or decrease to change shake sensitivity. This
+                                requires a minimum value of 10. 10 is the total
+                                acceleration if the board is not moving, therefore
+                                anything less than 10 will erroneously report a constant
+                                shake detected. (Default 30)
+
+        :param avg_count: The number of readings taken and used for the average
+                          acceleration. (Default 10)
+
+        :param total_delay: The total time in seconds it takes to obtain avg_count
+                            readings from acceleration. (Default 0.1)
          """
         shake_accel = (0, 0, 0)
         for _ in range(avg_count):
@@ -204,24 +224,25 @@ class LIS3DH:
 
     @property
     def tapped(self):
-        """True if a tap was detected recently. Whether its a single tap or double tap is
-           determined by the tap param on ``set_tap``. ``tapped`` may be True over
-           multiple reads even if only a single tap or single double tap occurred if the
-           interrupt (int) pin is not specified.
+        """
+        True if a tap was detected recently. Whether its a single tap or double tap is
+        determined by the tap param on ``set_tap``. ``tapped`` may be True over
+        multiple reads even if only a single tap or single double tap occurred if the
+        interrupt (int) pin is not specified.
 
-           The following example uses ``i2c`` and specifies the interrupt pin:
+        The following example uses ``i2c`` and specifies the interrupt pin:
 
-           .. code-block:: python
+        .. code-block:: python
 
-             import adafruit_lis3dh
-             import digitalio
+            import adafruit_lis3dh
+            import digitalio
 
-             i2c = busio.I2C(board.SCL, board.SDA)
-             int1 = digitalio.DigitalInOut(board.D11) # pin connected to interrupt
-             lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, int1=int1)
-             lis3dh.range = adafruit_lis3dh.RANGE_8_G
+            i2c = busio.I2C(board.SCL, board.SDA)
+            int1 = digitalio.DigitalInOut(board.D11) # pin connected to interrupt
+            lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, int1=int1)
+            lis3dh.range = adafruit_lis3dh.RANGE_8_G
 
-           """
+        """
         if self._int1 and not self._int1.value:
             return False
         raw = self._read_register_byte(REG_CLICKSRC)
@@ -229,20 +250,24 @@ class LIS3DH:
 
     def set_tap(self, tap, threshold, *,
                 time_limit=10, time_latency=20, time_window=255, click_cfg=None):
-        """Set the tap detection parameters.
+        """
+        The tap detection parameters.
 
-           .. note:: Tap related registers are called CLICK_ in the datasheet.
+        .. note:: Tap related registers are called ``CLICK_`` in the datasheet.
 
-            :param int tap: 0 to disable tap detection, 1 to detect only single
-              taps, and 2 to detect only double taps.
-            :param int threshold: A threshold for the tap detection.  The higher the value
-              the less sensitive the detection.  This changes based on the accelerometer
-              range.  Good values are 5-10 for 16G, 10-20 for 8G, 20-40 for 4G, and 40-80 for
-              2G.
-            :param int time_limit: TIME_LIMIT register value (default 10).
-            :param int time_latency: TIME_LATENCY register value (default 20).
-            :param int time_window: TIME_WINDOW register value (default 255).
-            :param int click_cfg: CLICK_CFG register value."""
+        :param int tap: 0 to disable tap detection, 1 to detect only single
+                        taps, and 2 to detect only double taps.
+
+        :param int threshold: A threshold for the tap detection.  The higher the value
+                              the less sensitive the detection.  This changes based on
+                              the accelerometer range.  Good values are 5-10 for 16G,
+                              10-20 for 8G, 20-40 for 4G, and 40-80 for 2G.
+
+        :param int time_limit: TIME_LIMIT register value (default 10).
+        :param int time_latency: TIME_LATENCY register value (default 20).
+        :param int time_window: TIME_WINDOW register value (default 255).
+        :param int click_cfg: CLICK_CFG register value.
+        """
         if (tap < 0 or tap > 2) and click_cfg is None:
             raise ValueError('Tap must be 0 (disabled), 1 (single tap), or 2 (double tap)!')
         if threshold > 127 or threshold < 0:
