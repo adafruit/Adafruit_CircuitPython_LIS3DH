@@ -3,8 +3,8 @@ Simple test
 
 Ensure your device works with this simple test.
 
-.. literalinclude:: ../examples/accel.py
-    :caption: examples/accel.py
+.. literalinclude:: ../examples/lis3dh_simpletest.py
+    :caption: examples/lis3dh_simpletest.py
     :linenos:
 
 Here are some additional examples:
