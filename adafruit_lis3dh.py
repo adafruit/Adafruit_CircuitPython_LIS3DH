@@ -251,7 +251,7 @@ class LIS3DH:
     def set_tap(self, tap, threshold, *,
                 time_limit=10, time_latency=20, time_window=255, click_cfg=None):
         """
-        Set the tap detection parameters.
+        The tap detection parameters.
 
         .. note:: Tap related registers are called ``CLICK_`` in the datasheet.
 
