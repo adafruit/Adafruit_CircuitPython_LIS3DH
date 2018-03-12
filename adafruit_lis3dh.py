@@ -33,6 +33,7 @@ Implementation Notes
 import time
 import math
 import digitalio
+from ucollections import namedtuple
 try:
     import struct
 except ImportError:
@@ -81,6 +82,9 @@ DATARATE_LOWPOWER_5KHZ   = const(0b1001)
 # Other constants
 STANDARD_GRAVITY = 9.806
 # pylint: enable=bad-whitespace
+
+# the named tuple returned by the class
+AccelerationTuple = namedtuple("acceleration", ("x", "y", "z"))
 
 
 class LIS3DH:
@@ -162,7 +166,7 @@ class LIS3DH:
         y = (y / divider) * STANDARD_GRAVITY
         z = (z / divider) * STANDARD_GRAVITY
 
-        return x, y, z
+        return AccelerationTuple(x, y, z)
 
     def shake(self, shake_threshold=30, avg_count=10, total_delay=0.1):
         """
