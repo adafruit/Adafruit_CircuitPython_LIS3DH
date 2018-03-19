@@ -19,11 +19,6 @@ else:
     i2c = busio.I2C(board.SCL, board.SDA)
     lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c)
 
-# Hardware I2C setup on CircuitPlayground Express:
-# import busio
-# i2c = busio.I2C(board.ACCELEROMETER_SCL, board.ACCELEROMETER_SDA)
-# lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x19)
-
 # Software I2C setup:
 #import bitbangio
 #i2c = bitbangio.I2C(board.SCL, board.SDA)
