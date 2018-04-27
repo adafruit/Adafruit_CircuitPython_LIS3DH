@@ -8,15 +8,15 @@ import adafruit_lis3dh
 
 # Uncomment _one_ of the hardware setups below depending on your wiring:
 
-# Hardware I2C setup:
+# Hardware I2C setup. Use the CircuitPlayground built-in accelerometer if available;
+# otherwise check I2C pins.
 import busio
-i2c = busio.I2C(board.SCL, board.SDA)
-lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x19)
-
-# Hardware I2C setup on CircuitPlayground Express:
-# import busio
-# i2c = busio.I2C(board.ACCELEROMETER_SCL, board.ACCELEROMETER_SDA)
-# lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x19)
+if hasattr(board, 'ACCELEROMETER_SCL'):
+    i2c = busio.I2C(board.ACCELEROMETER_SCL, board.ACCELEROMETER_SDA)
+    lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x19)
+else:
+    i2c = busio.I2C(board.SCL, board.SDA)
+    lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c)
 
 # Software I2C setup:
 #import bitbangio
