@@ -2,6 +2,7 @@
 # Will loop forever printing when a single or double click is detected.
 # Open the serial port after running to see the output printed.
 # Author: Tony DiCola
+import time
 import board
 import adafruit_lis3dh
 
@@ -45,11 +46,8 @@ lis3dh.range = adafruit_lis3dh.RANGE_2_G
 #  - 16G = 5-10 threshold
 lis3dh.set_tap(2, 80)
 
-# Loop forever printing if a double tap is detected. A single double tap may cause multiple
-# `tapped` reads to return true so we make sure the last once was False.
-last_tap = False
+# Loop forever printing if a double tap is detected.
 while True:
-    tap = lis3dh.tapped
-    if tap and not last_tap:
+    if lis3dh.tapped:
         print('Double tap!')
-    last_tap = tap
+    time.sleep(0.5)
