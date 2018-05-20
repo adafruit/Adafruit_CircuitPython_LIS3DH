@@ -33,7 +33,10 @@ Implementation Notes
 import time
 import math
 import digitalio
-from ucollections import namedtuple
+try:
+    from collections import namedtuple
+except ImportError:
+    from ucollections import namedtuple
 try:
     import struct
 except ImportError:
