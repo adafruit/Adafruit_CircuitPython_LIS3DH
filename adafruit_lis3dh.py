@@ -49,21 +49,21 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_LIS3DH.git"
 
 # Register addresses:
 # pylint: disable=bad-whitespace
-REG_OUTADC1_L   = const(0x08)
-REG_WHOAMI      = const(0x0F)
-REG_TEMPCFG     = const(0x1F)
-REG_CTRL1       = const(0x20)
-REG_CTRL3       = const(0x22)
-REG_CTRL4       = const(0x23)
-REG_CTRL5       = const(0x24)
-REG_OUT_X_L     = const(0x28)
-REG_INT1SRC     = const(0x31)
-REG_CLICKCFG    = const(0x38)
-REG_CLICKSRC    = const(0x39)
-REG_CLICKTHS    = const(0x3A)
-REG_TIMELIMIT   = const(0x3B)
-REG_TIMELATENCY = const(0x3C)
-REG_TIMEWINDOW  = const(0x3D)
+_REG_OUTADC1_L   = const(0x08)
+_REG_WHOAMI      = const(0x0F)
+_REG_TEMPCFG     = const(0x1F)
+_REG_CTRL1       = const(0x20)
+_REG_CTRL3       = const(0x22)
+_REG_CTRL4       = const(0x23)
+_REG_CTRL5       = const(0x24)
+_REG_OUT_X_L     = const(0x28)
+_REG_INT1SRC     = const(0x31)
+_REG_CLICKCFG    = const(0x38)
+_REG_CLICKSRC    = const(0x39)
+_REG_CLICKTHS    = const(0x3A)
+_REG_TIMELIMIT   = const(0x3B)
+_REG_TIMELATENCY = const(0x3C)
+_REG_TIMEWINDOW  = const(0x3D)
 
 # Register value constants:
 RANGE_16_G               = const(0b11)    # +/- 16g
@@ -94,22 +94,22 @@ class LIS3DH:
     """Driver base for the LIS3DH accelerometer."""
     def __init__(self, int1=None, int2=None):
         # Check device ID.
-        device_id = self._read_register_byte(REG_WHOAMI)
+        device_id = self._read_register_byte(_REG_WHOAMI)
         if device_id != 0x33:
             raise RuntimeError('Failed to find LIS3DH!')
         # Reboot
-        self._write_register_byte(REG_CTRL5, 0x80)
+        self._write_register_byte(_REG_CTRL5, 0x80)
         time.sleep(0.01)  # takes 5ms
         # Enable all axes, normal mode.
-        self._write_register_byte(REG_CTRL1, 0x07)
+        self._write_register_byte(_REG_CTRL1, 0x07)
         # Set 400Hz data rate.
         self.data_rate = DATARATE_400_HZ
         # High res & BDU enabled.
-        self._write_register_byte(REG_CTRL4, 0x88)
+        self._write_register_byte(_REG_CTRL4, 0x88)
         # Enable ADCs.
-        self._write_register_byte(REG_TEMPCFG, 0x80)
+        self._write_register_byte(_REG_TEMPCFG, 0x80)
         # Latch interrupt for INT1
-        self._write_register_byte(REG_CTRL5, 0x08)
+        self._write_register_byte(_REG_CTRL5, 0x08)
 
         # Initialise interrupt pins
         self._int1 = int1
@@ -124,29 +124,29 @@ class LIS3DH:
            DATA_RATE_100_HZ, DATA_RATE_50_HZ, DATA_RATE_25_HZ, DATA_RATE_10_HZ,
            DATA_RATE_1_HZ, DATA_RATE_POWERDOWN, DATA_RATE_LOWPOWER_1K6HZ, or
            DATA_RATE_LOWPOWER_5KHZ."""
-        ctl1 = self._read_register_byte(REG_CTRL1)
+        ctl1 = self._read_register_byte(_REG_CTRL1)
         return (ctl1 >> 4) & 0x0F
 
     @data_rate.setter
     def data_rate(self, rate):
-        ctl1 = self._read_register_byte(REG_CTRL1)
+        ctl1 = self._read_register_byte(_REG_CTRL1)
         ctl1 &= ~(0xF0)
         ctl1 |= rate << 4
-        self._write_register_byte(REG_CTRL1, ctl1)
+        self._write_register_byte(_REG_CTRL1, ctl1)
 
     @property
     def range(self):
         """The range of the accelerometer.  Can be RANGE_2_G, RANGE_4_G, RANGE_8_G, or
            RANGE_16_G."""
-        ctl4 = self._read_register_byte(REG_CTRL4)
+        ctl4 = self._read_register_byte(_REG_CTRL4)
         return (ctl4 >> 4) & 0x03
 
     @range.setter
     def range(self, range_value):
-        ctl4 = self._read_register_byte(REG_CTRL4)
+        ctl4 = self._read_register_byte(_REG_CTRL4)
         ctl4 &= ~0x30
         ctl4 |= range_value << 4
-        self._write_register_byte(REG_CTRL4, ctl4)
+        self._write_register_byte(_REG_CTRL4, ctl4)
 
     @property
     def acceleration(self):
@@ -162,7 +162,7 @@ class LIS3DH:
         elif accel_range == RANGE_2_G:
             divider = 16380
 
-        x, y, z = struct.unpack('<hhh', self._read_register(REG_OUT_X_L | 0x80, 6))
+        x, y, z = struct.unpack('<hhh', self._read_register(_REG_OUT_X_L | 0x80, 6))
 
         # convert from Gs to m / s ^ 2 and adjust for the range
         x = (x / divider) * STANDARD_GRAVITY
@@ -209,7 +209,7 @@ class LIS3DH:
         if adc < 1 or adc > 3:
             raise ValueError('ADC must be a value 1 to 3!')
 
-        return struct.unpack('<h', self._read_register((REG_OUTADC1_L+((adc-1)*2)) | 0x80, 2))[0]
+        return struct.unpack('<h', self._read_register((_REG_OUTADC1_L+((adc-1)*2)) | 0x80, 2))[0]
 
     def read_adc_mV(self, adc): # pylint: disable=invalid-name
         """Read the specified analog to digital converter value in millivolts.
@@ -252,7 +252,7 @@ class LIS3DH:
         """
         if self._int1 and not self._int1.value:
             return False
-        raw = self._read_register_byte(REG_CLICKSRC)
+        raw = self._read_register_byte(_REG_CLICKSRC)
         return raw & 0x40 > 0
 
     def set_tap(self, tap, threshold, *,
@@ -280,14 +280,14 @@ class LIS3DH:
         if threshold > 127 or threshold < 0:
             raise ValueError('Threshold out of range (0-127)')
 
-        ctrl3 = self._read_register_byte(REG_CTRL3)
+        ctrl3 = self._read_register_byte(_REG_CTRL3)
         if tap == 0 and click_cfg is None:
             # Disable click interrupt.
-            self._write_register_byte(REG_CTRL3, ctrl3 & ~(0x80))  # Turn off I1_CLICK.
-            self._write_register_byte(REG_CLICKCFG, 0)
+            self._write_register_byte(_REG_CTRL3, ctrl3 & ~(0x80))  # Turn off I1_CLICK.
+            self._write_register_byte(_REG_CLICKCFG, 0)
             return
         else:
-            self._write_register_byte(REG_CTRL3, ctrl3 | 0x80)  # Turn on int1 click output
+            self._write_register_byte(_REG_CTRL3, ctrl3 | 0x80)  # Turn on int1 click output
 
         if click_cfg is None:
             if tap == 1:
@@ -295,11 +295,11 @@ class LIS3DH:
             if tap == 2:
                 click_cfg = 0x2A  # Turn on all axes & doubletap.
         # Or, if a custom click configuration register value specified, use it.
-        self._write_register_byte(REG_CLICKCFG, click_cfg)
-        self._write_register_byte(REG_CLICKTHS, 0x80 | threshold)
-        self._write_register_byte(REG_TIMELIMIT, time_limit)
-        self._write_register_byte(REG_TIMELATENCY, time_latency)
-        self._write_register_byte(REG_TIMEWINDOW, time_window)
+        self._write_register_byte(_REG_CLICKCFG, click_cfg)
+        self._write_register_byte(_REG_CLICKTHS, 0x80 | threshold)
+        self._write_register_byte(_REG_TIMELIMIT, time_limit)
+        self._write_register_byte(_REG_TIMELATENCY, time_latency)
+        self._write_register_byte(_REG_TIMEWINDOW, time_window)
 
     def _read_register_byte(self, register):
         # Read a byte register value and return it.
@@ -360,7 +360,7 @@ class LIS3DH_SPI(LIS3DH):
             return self._buffer
 
     def _write_register_byte(self, register, value):
-        self._buffer[0] = (register & (~0x80 & 0xFF)) & 0xFF  # Write, bit 7 low.
+        self._buffer[0] = register & 0x7F  # Write, bit 7 low.
         self._buffer[1] = value & 0xFF
         with self._spi as spi:
             spi.write(self._buffer, start=0, end=2)

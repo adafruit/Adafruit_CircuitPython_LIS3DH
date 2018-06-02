@@ -16,6 +16,7 @@ import busio
 import adafruit_lis3dh
 import neopixel
 
+from micropython import const
 
 # Configuration:
 ACCEL_RANGE = adafruit_lis3dh.RANGE_16_G  # Accelerometer range.
@@ -70,8 +71,11 @@ lis3dh.set_tap(1, TAP_THRESHOLD, click_cfg=0x01)
 # call internal methods that change a few register values.  This must be done
 # AFTER calling set_tap above because the set_tap function also changes
 # REG_CTRL5.
+# Define register numbers, which are not exported from the library.
+_REG_CTRL5 = const(0x24)
+_REG_CLICKSRC = const(0x39)
 # pylint: disable=protected-access
-lis3dh._write_register_byte(adafruit_lis3dh.REG_CTRL5, 0b01001000)
+lis3dh._write_register_byte(_REG_CTRL5, 0b01001000)
 lis3dh._write_register_byte(0x2E, 0b10000000)  # Set FIFO_CTRL to Stream mode.
 # pylint: disable=protected-access
 
@@ -85,7 +89,7 @@ last = time.monotonic()  # Keep track of the last time the loop ran.
 while True:
     # Read the raw click detection register value and check if there was
     # a click detected.
-    clicksrc = lis3dh._read_register_byte(adafruit_lis3dh.REG_CLICKSRC) # pylint: disable=protected-access
+    clicksrc = lis3dh._read_register_byte(_REG_CLICKSRC) # pylint: disable=protected-access
     if clicksrc & 0b01000000 > 0:
         # Click was detected!  Quickly read 32 values from the accelerometer
         # FIFO and look for the maximum magnitude values.

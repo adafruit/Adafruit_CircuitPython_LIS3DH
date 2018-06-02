@@ -23,6 +23,7 @@ import digitalio
 import adafruit_lis3dh
 import neopixel
 
+from micropython import const
 
 # Configuration:
 ACCEL_RANGE = adafruit_lis3dh.RANGE_16_G  # Accelerometer range.
@@ -191,8 +192,11 @@ lis3dh.set_tap(1, TAP_THRESHOLD, click_cfg=0x01)
 # readings in a FIFO buffer so they can be read later to see a history of
 # recent acceleration.  This is handy to look for the maximum/minimum impulse
 # after a click is detected.
+# Define register numbers, which are not exported from the library.
+_REG_CTRL5 = const(0x24)
+_REG_CLICKSRC = const(0x39)
 # pylint: disable=protected-access
-lis3dh._write_register_byte(adafruit_lis3dh.REG_CTRL5, 0b01001000)
+lis3dh._write_register_byte(_REG_CTRL5, 0b01001000)
 lis3dh._write_register_byte(0x2E, 0b10000000)  # Set FIFO_CTRL to Stream mode.
 # pylint: disable=protected-access
 
@@ -219,7 +223,7 @@ while True:
     # Read the raw click detection register value and check if there was
     # a click detected.  Remember only the X axis causes clicks because of
     # the register configuration set previously.
-    clicksrc = lis3dh._read_register_byte(adafruit_lis3dh.REG_CLICKSRC) # pylint: disable=protected-access
+    clicksrc = lis3dh._read_register_byte(_REG_CLICKSRC) # pylint: disable=protected-access
     if clicksrc & 0b01000000 > 0:
         # Click was detected!  Quickly read 32 values from the accelerometer
         # and look for the maximum magnitude values.  Because the
