@@ -29,5 +29,4 @@ script:
 - ([[ ! -d "examples" ]] || pylint --disable=missing-docstring,invalid-name examples/*.py)
 - circuitpython-build-bundles --filename_prefix adafruit-circuitpython-lis3dh --library_location
   .
-- cd docs && sphinx-build -E -W -b - cd docs && sphinx-build -E -W -b html . _build/html && cd ..
-html . _build/html
+- cd docs && sphinx-build -E -W -b html . _build/html && cd ..
