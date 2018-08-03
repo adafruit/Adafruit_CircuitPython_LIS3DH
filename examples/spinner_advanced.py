@@ -20,10 +20,10 @@ import board
 import busio
 import digitalio
 
+from micropython import const
+
 import adafruit_lis3dh
 import neopixel
-
-from micropython import const
 
 # Configuration:
 ACCEL_RANGE = adafruit_lis3dh.RANGE_16_G  # Accelerometer range.
@@ -134,6 +134,7 @@ class DiscreteDotAnimation:
             self._pixels[pos] = primary
         self._pixels.show()
 
+
 class SmoothAnimation:
 
     def __init__(self, pixels, frequency=2.0):
@@ -162,6 +163,7 @@ class SmoothAnimation:
         self._pixels.show()
 
 
+# pylint: disable=no-member
 # Initialize and turn off NeoPixels.
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, auto_write=False)
 pixels.fill((0, 0, 0))

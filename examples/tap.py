@@ -3,15 +3,16 @@
 # Open the serial port after running to see the output printed.
 # Author: Tony DiCola
 import board
-import adafruit_lis3dh
 import busio
 import digitalio
+import adafruit_lis3dh
 
 
 # Uncomment _one_ of the hardware setups below depending on your wiring:
 
 # Hardware I2C setup. Use the CircuitPlayground built-in accelerometer if available;
 # otherwise check I2C pins.
+# pylint: disable=no-member
 if hasattr(board, 'ACCELEROMETER_SCL'):
     i2c = busio.I2C(board.ACCELEROMETER_SCL, board.ACCELEROMETER_SDA)
     int1 = digitalio.DigitalInOut(board.ACCELEROMETER_INTERRUPT)

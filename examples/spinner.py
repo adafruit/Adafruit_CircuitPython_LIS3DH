@@ -13,10 +13,10 @@ import time
 import board
 import busio
 
+from micropython import const
+
 import adafruit_lis3dh
 import neopixel
-
-from micropython import const
 
 # Configuration:
 ACCEL_RANGE = adafruit_lis3dh.RANGE_16_G  # Accelerometer range.
@@ -55,6 +55,7 @@ class FidgetSpinner:
         return self._position
 
 
+# pylint: disable=no-member
 # Initialize NeoPixels and accelerometer.
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, auto_write=False)
 pixels.fill((0, 0, 0))

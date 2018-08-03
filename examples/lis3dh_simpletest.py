@@ -4,6 +4,7 @@
 # Author: Tony DiCola
 import time
 import board
+import busio
 import adafruit_lis3dh
 
 
@@ -11,7 +12,7 @@ import adafruit_lis3dh
 
 # Hardware I2C setup. Use the CircuitPlayground built-in accelerometer if available;
 # otherwise check I2C pins.
-import busio
+# pylint: disable=no-member
 if hasattr(board, 'ACCELEROMETER_SCL'):
     i2c = busio.I2C(board.ACCELEROMETER_SCL, board.ACCELEROMETER_SDA)
     lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x19)

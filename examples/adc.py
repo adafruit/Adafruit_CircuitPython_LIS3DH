@@ -5,13 +5,13 @@
 # Author: Tony DiCola
 import time
 import board
+import busio
 import adafruit_lis3dh
 
 
 # Uncomment _one_ of the hardware setups below depending on your wiring:
 
 # Hardware I2C setup:
-import busio
 i2c = busio.I2C(board.SCL, board.SDA)
 lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c)
 
