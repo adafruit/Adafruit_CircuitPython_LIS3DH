@@ -1,37 +1,19 @@
-# Tap detection example.
-# Will loop forever printing when a single or double click is detected.
-# Open the serial port after running to see the output printed.
-# Author: Tony DiCola
+import time
 import board
 import busio
 import digitalio
 import adafruit_lis3dh
 
-
-# Uncomment _one_ of the hardware setups below depending on your wiring:
-
 # Hardware I2C setup. Use the CircuitPlayground built-in accelerometer if available;
 # otherwise check I2C pins.
-# pylint: disable=no-member
 if hasattr(board, 'ACCELEROMETER_SCL'):
     i2c = busio.I2C(board.ACCELEROMETER_SCL, board.ACCELEROMETER_SDA)
     int1 = digitalio.DigitalInOut(board.ACCELEROMETER_INTERRUPT)
     lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x19, int1=int1)
 else:
     i2c = busio.I2C(board.SCL, board.SDA)
-    int1 = digitalio.DigitalInOut(board.D10)  # Set this to the correct pin for the interrupt!
+    int1 = digitalio.DigitalInOut(board.D9)  # Set this to the correct pin for the interrupt!
     lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, int1=int1)
-
-# Software I2C setup:
-# import bitbangio
-# i2c = bitbangio.I2C(board.SCL, board.SDA)
-# lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c)
-
-# Hardware SPI setup:
-# import busio
-# spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
-# cs = busio.DigitalInOut(board.D6)  # Set to appropriate CS pin!
-# lis3dh = adafruit_lis3dh.LIS3DH_SPI(spi, cs)
 
 # Set range of accelerometer (can be RANGE_2_G, RANGE_4_G, RANGE_8_G or RANGE_16_G).
 lis3dh.range = adafruit_lis3dh.RANGE_8_G
@@ -52,3 +34,4 @@ lis3dh.set_tap(2, 60)
 while True:
     if lis3dh.tapped:
         print('Tapped!')
+        time.sleep(0.01)
