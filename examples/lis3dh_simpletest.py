@@ -12,13 +12,14 @@ if hasattr(board, 'ACCELEROMETER_SCL'):
     lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x19, int1=int1)
 else:
     i2c = busio.I2C(board.SCL, board.SDA)
-    int1 = digitalio.DigitalInOut(board.D6)  # Set this to the correct pin for the interrupt!
+    int1 = digitalio.DigitalInOut(board.D6)  # Set to correct pin for interrupt!
     lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, int1=int1)
 
 # Hardware SPI setup:
 # spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
-# cs = digitalio.DigitalInOut(board.D9)  # Set to appropriate CS pin!
-# lis3dh = adafruit_lis3dh.LIS3DH_SPI(spi, cs)
+# cs = digitalio.DigitalInOut(board.D5)  # Set to correct CS pin!
+# int1 = digitalio.DigitalInOut(board.D6)  # Set to correct pin for interrupt!
+# lis3dh = adafruit_lis3dh.LIS3DH_SPI(spi, cs, int1=int1)
 
 
 # Set range of accelerometer (can be RANGE_2_G, RANGE_4_G, RANGE_8_G or RANGE_16_G).
