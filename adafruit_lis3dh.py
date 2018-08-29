@@ -355,12 +355,12 @@ class LIS3DH_SPI(LIS3DH):
         else:
             self._buffer[0] = (register | 0xC0) & 0xFF  # Read multiple, bit 6&7 high.
         with self._spi as spi:
-            spi.write(self._buffer, start=0, end=1)
-            spi.readinto(self._buffer, start=0, end=length)
+            spi.write(self._buffer, start=0, end=1) # pylint: disable=no-member
+            spi.readinto(self._buffer, start=0, end=length) # pylint: disable=no-member
             return self._buffer
 
     def _write_register_byte(self, register, value):
         self._buffer[0] = register & 0x7F  # Write, bit 7 low.
         self._buffer[1] = value & 0xFF
         with self._spi as spi:
-            spi.write(self._buffer, start=0, end=2)
+            spi.write(self._buffer, start=0, end=2) # pylint: disable=no-member
