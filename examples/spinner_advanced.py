@@ -232,7 +232,7 @@ while True:
         # accelerometer is in FIFO stream mode it will keep a history of the
         # 32 last accelerometer readings and return them when consecutively
         # read.
-        maxval = lis3dh.acceleration[0]  # Grab just the X acceleration value.
+        maxval = abs(lis3dh.acceleration[0])  # Grab just the X acceleration value.
         for i in range(31):
             x = abs(lis3dh.acceleration[0])
             if x > maxval:
