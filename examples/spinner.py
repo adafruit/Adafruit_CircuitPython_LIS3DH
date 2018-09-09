@@ -94,7 +94,7 @@ while True:
     if clicksrc & 0b01000000 > 0:
         # Click was detected!  Quickly read 32 values from the accelerometer
         # FIFO and look for the maximum magnitude values.
-        maxval = lis3dh.acceleration[0]  # Grab just the X acceleration value.
+        maxval = abs(lis3dh.acceleration[0])  # Grab just the X acceleration value.
         for i in range(31):
             x = abs(lis3dh.acceleration[0])
             if x > maxval:
