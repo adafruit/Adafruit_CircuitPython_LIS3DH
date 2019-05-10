@@ -9,14 +9,14 @@ Ensure your device works with this simple test.
 
 Here are some additional examples:
 
-.. literalinclude:: ../examples/tap.py
-    :caption: examples/tap.py
+.. literalinclude:: ../examples/lis3dh_tap.py
+    :caption: examples/lis3dh_tap.py
     :linenos:
 
-.. literalinclude:: ../examples/adc.py
-    :caption: examples/adc.py
+.. literalinclude:: ../examples/lis3dh_adc.py
+    :caption: examples/lis3dh_adc.py
     :linenos:
 
-.. literalinclude:: ../examples/spinner.py
-    :caption: examples/spinner.py
+.. literalinclude:: ../examples/lis3dh_spinner.py
+    :caption: examples/lis3dh_spinner.py
     :linenos:
