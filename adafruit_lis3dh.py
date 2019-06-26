@@ -32,9 +32,9 @@ Implementation Notes
 
 import time
 import math
-import digitalio
 from collections import namedtuple
 import struct
+import digitalio
 
 from micropython import const
 
