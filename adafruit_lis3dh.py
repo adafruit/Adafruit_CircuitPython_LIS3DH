@@ -33,14 +33,8 @@ Implementation Notes
 import time
 import math
 import digitalio
-try:
-    from collections import namedtuple
-except ImportError:
-    from ucollections import namedtuple
-try:
-    import struct
-except ImportError:
-    import ustruct as struct
+from collections import namedtuple
+import struct
 
 from micropython import const
 
