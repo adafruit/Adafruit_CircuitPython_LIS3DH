@@ -21,7 +21,7 @@ else:
 # int1 = digitalio.DigitalInOut(board.D6)  # Set to correct pin for interrupt!
 # lis3dh = adafruit_lis3dh.LIS3DH_SPI(spi, cs, int1=int1)
 
-#PyGamer SPI Setup:
+#PyGamer I2C Setup:
 #i2c = busio.I2C(board.SCL, board.SDA)
 #int1 = digitalio.DigitalInOut(board.ACCELEROMETER_INTERRUPT)
 #lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x19, int1=int1)
