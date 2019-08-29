@@ -203,7 +203,8 @@ class LIS3DH:
         if adc < 1 or adc > 3:
             raise ValueError('ADC must be a value 1 to 3!')
 
-        return struct.unpack('<h', self._read_register((_REG_OUTADC1_L+((adc-1)*2)) | 0x80, 2))[0]
+        return struct.unpack('<h',
+                             self._read_register((_REG_OUTADC1_L+((adc-1)*2)) | 0x80, 2)[0:2])[0]
 
     def read_adc_mV(self, adc): # pylint: disable=invalid-name
         """Read the specified analog to digital converter value in millivolts.
@@ -280,8 +281,7 @@ class LIS3DH:
             self._write_register_byte(_REG_CTRL3, ctrl3 & ~(0x80))  # Turn off I1_CLICK.
             self._write_register_byte(_REG_CLICKCFG, 0)
             return
-        else:
-            self._write_register_byte(_REG_CTRL3, ctrl3 | 0x80)  # Turn on int1 click output
+        self._write_register_byte(_REG_CTRL3, ctrl3 | 0x80)  # Turn on int1 click output
 
         if click_cfg is None:
             if tap == 1:
