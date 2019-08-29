@@ -1,30 +1,32 @@
 # Analog to digital converter example.
 # Will loop forever printing ADC channel 1 raw and mV values every second.
-# Open the serial port after running to see the output printed.
-# NOTE the ADC can only read voltages in the range of ~900mV to 1200mV!
-# Author: Tony DiCola
+# NOTE the ADC can only read voltages in the range of ~900mV to 1800mV!
+
 import time
 import board
 import busio
 import adafruit_lis3dh
+# Uncomment if using SPI
+#import digitalio
 
 
-# Uncomment _one_ of the hardware setups below depending on your wiring:
-
-# Hardware I2C setup:
-i2c = busio.I2C(board.SCL, board.SDA)
-lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c)
-
-# Software I2C setup:
-#import bitbangio
-#i2c = bitbangio.I2C(board.SCL, board.SDA)
-#lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c)
+# Hardware I2C setup. Use the CircuitPlayground built-in accelerometer if available;
+# otherwise check I2C pins.
+if hasattr(board, 'ACCELEROMETER_SCL'):
+    i2c = busio.I2C(board.ACCELEROMETER_SCL, board.ACCELEROMETER_SDA)
+    lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x19)
+else:
+    i2c = busio.I2C(board.SCL, board.SDA)
+    lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c)
 
 # Hardware SPI setup:
-#import busio
-#spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
-#cs = busio.DigitalInOut(board.D6)  # Set to appropriate CS pin!
-#lis3dh = adafruit_lis3dh.LIS3DH_SPI(spi, cs)
+# spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
+# cs = digitalio.DigitalInOut(board.D5)  # Set to correct CS pin!
+# lis3dh = adafruit_lis3dh.LIS3DH_SPI(spi, cs)
+
+#PyGamer I2C Setup:
+#i2c = busio.I2C(board.SCL, board.SDA)
+#lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x19)
 
 
 # Loop forever printing ADC readings.
