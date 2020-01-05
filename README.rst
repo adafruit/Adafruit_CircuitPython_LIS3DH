@@ -10,8 +10,8 @@ Introduction
     :target: https://discord.gg/nBQh6qu
     :alt: Discord
 
-.. image:: https://travis-ci.com/adafruit/Adafruit_CircuitPython_LIS3DH.svg?branch=master
-    :target: https://travis-ci.com/adafruit/Adafruit_CircuitPython_LIS3DH
+.. image:: https://github.com/adafruit/Adafruit_CircuitPython_LIS3DH/workflows/Build%20CI/badge.svg
+    :target: https://github.com/adafruit/Adafruit_CircuitPython_LIS3DH/actions/
     :alt: Build Status
 
 Adafruit CircuitPython module for the LIS3DH accelerometer.
