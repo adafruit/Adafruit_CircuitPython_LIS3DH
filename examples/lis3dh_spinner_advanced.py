@@ -27,21 +27,21 @@ import neopixel
 
 # Configuration:
 ACCEL_RANGE = adafruit_lis3dh.RANGE_16_G  # Accelerometer range.
-TAP_THRESHOLD = 20              # Accelerometer tap threshold.  Higher values
-                                # mean you need to tap harder to start a spin.
-SPINNER_DECAY = 0.5             # Decay rate for the spinner.  Set to a value
-                                # from 0 to 1.0 where lower values mean the
-                                # spinner slows down faster.
+TAP_THRESHOLD = 20  # Accelerometer tap threshold.  Higher values
+# mean you need to tap harder to start a spin.
+SPINNER_DECAY = 0.5  # Decay rate for the spinner.  Set to a value
+# from 0 to 1.0 where lower values mean the
+# spinner slows down faster.
 # Define list of color combinations.  Pressing button A will cycle through
 # these combos.  Each tuple entry (line) should be a 2-tuple of 3-tuple RGB
 # values (0-255).
 COLORS = (
-    ((255, 0, 0), (0, 0, 0)),      # Red to black
-    ((0, 255, 0), (0, 0, 0)),      # Green to black
-    ((0, 0, 255), (0, 0, 0)),      # Blue to black
-    ((255, 0, 0), (0, 255, 0)),    # Red to green
-    ((255, 0, 0), (0, 0, 255)),    # Red to blue
-    ((0, 255, 0), (0, 0, 255))     # Green to blue
+    ((255, 0, 0), (0, 0, 0)),  # Red to black
+    ((0, 255, 0), (0, 0, 0)),  # Green to black
+    ((0, 0, 255), (0, 0, 0)),  # Blue to black
+    ((255, 0, 0), (0, 255, 0)),  # Red to green
+    ((255, 0, 0), (0, 0, 255)),  # Red to blue
+    ((0, 255, 0), (0, 0, 255)),  # Green to blue
 )
 
 
@@ -50,7 +50,8 @@ def lerp(x, x0, x1, y0, y1):
     """Linearly interpolate a value y given range y0...y1 that is proportional
     to x in range x0...x1 .
     """
-    return y0 + (x-x0)*((y1-y0)/(x1-x0))
+    return y0 + (x - x0) * ((y1 - y0) / (x1 - x0))
+
 
 def color_lerp(x, x0, x1, c0, c1):
     """Linearly interpolate RGB colors (3-tuples of byte values) given x
@@ -58,9 +59,11 @@ def color_lerp(x, x0, x1, c0, c1):
     """
     r0, g0, b0 = c0
     r1, g1, b1 = c1
-    return (int(lerp(x, x0, x1, r0, r1)),
-            int(lerp(x, x0, x1, g0, g1)),
-            int(lerp(x, x0, x1, b0, b1)))
+    return (
+        int(lerp(x, x0, x1, r0, r1)),
+        int(lerp(x, x0, x1, g0, g1)),
+        int(lerp(x, x0, x1, b0, b1)),
+    )
 
 
 # Define a class that represents the fidget spinner.  The spinner only has a
@@ -70,7 +73,6 @@ def color_lerp(x, x0, x1, c0, c1):
 # position.  Since the position moves between values 0 to 10 it can easily map
 # to pixel positions around the Circuit Playground Express board.
 class FidgetSpinner:
-
     def __init__(self, decay=0.5):
         """Create an instance of the fidget spinner.  Specify the decay rate
         as a value from 0 to 1 (continuous, floating point)--lower decay rate
@@ -96,9 +98,9 @@ class FidgetSpinner:
         # Increment elapsed time and compute the current velocity after a
         # decay of the initial velocity.
         self._elapsed += delta
-        current_velocity = self._velocity*math.pow(self._decay, self._elapsed)
+        current_velocity = self._velocity * math.pow(self._decay, self._elapsed)
         # Update position based on the current_velocity and elapsed time.
-        self._position += current_velocity*delta
+        self._position += current_velocity * delta
         # Make sure the position stays within values that range from 0 to <10.
         self._position = math.fmod(self._position, 10.0)
         if self._position < 0.0:
@@ -111,7 +113,6 @@ class FidgetSpinner:
 # secondary color (3-tuple of RGB bytes) and will render a frame of spinner
 # animation.
 class DiscreteDotAnimation:
-
     def __init__(self, pixels, dots=2):
         """Create an instance of a simple discrete dot animation.  The dots
         parameter controls how many dots are rendered on the display (each
@@ -130,13 +131,12 @@ class DiscreteDotAnimation:
         # position.
         self._pixels.fill(secondary)
         for i in range(self._dots):
-            pos = int(position + i*self._dot_offset) % self._pixels.n
+            pos = int(position + i * self._dot_offset) % self._pixels.n
             self._pixels[pos] = primary
         self._pixels.show()
 
 
 class SmoothAnimation:
-
     def __init__(self, pixels, frequency=2.0):
         """Create an instance of a smooth sine-wave based animation that sweeps
         around the board based on spinner position.  Frequency specifies how
@@ -145,8 +145,8 @@ class SmoothAnimation:
         self._pixels = pixels
         # Precompute some of the sine wave math factors so they aren't
         # recomputed in every loop iteration.
-        self._sin_scale = 2.0*math.pi*frequency/pixels.n
-        self._phase_scale = 2.0*math.pi/10.0
+        self._sin_scale = 2.0 * math.pi * frequency / pixels.n
+        self._phase_scale = 2.0 * math.pi / 10.0
 
     def update(self, position, primary, secondary):
         """Update the animation given the current spinner position and
@@ -156,9 +156,9 @@ class SmoothAnimation:
         # the pixels.  Each pixel color is computed based on interpolating
         # color based on its position around the board, and a phase offset that
         # changes based on fidget spinner position.
-        phase = self._phase_scale*position
+        phase = self._phase_scale * position
         for i in range(self._pixels.n):
-            x = math.sin(self._sin_scale*i - phase)
+            x = math.sin(self._sin_scale * i - phase)
             self._pixels[i] = color_lerp(x, -1.0, 1.0, primary, secondary)
         self._pixels.show()
 
@@ -207,12 +207,14 @@ spinner = FidgetSpinner(SPINNER_DECAY)
 
 # Other global state for the spinner animation:
 last = time.monotonic()  # Keep track of the last time the loop ran.
-color_index = 0          # Keep track of the currently selected color combo.
-animations = (DiscreteDotAnimation(pixels, 1),  # Define list of animations.
-              DiscreteDotAnimation(pixels, 2),  # Button B presses cycle
-              SmoothAnimation(pixels, 1),       # through these animations.
-              SmoothAnimation(pixels, 2))
-animation_index = 0      # Keep track of currently selected animation.
+color_index = 0  # Keep track of the currently selected color combo.
+animations = (
+    DiscreteDotAnimation(pixels, 1),  # Define list of animations.
+    DiscreteDotAnimation(pixels, 2),  # Button B presses cycle
+    SmoothAnimation(pixels, 1),  # through these animations.
+    SmoothAnimation(pixels, 2),
+)
+animation_index = 0  # Keep track of currently selected animation.
 
 # Main loop will run forever checking for click/taps from accelerometer and
 # then spinning the spinner.
@@ -225,7 +227,9 @@ while True:
     # Read the raw click detection register value and check if there was
     # a click detected.  Remember only the X axis causes clicks because of
     # the register configuration set previously.
-    clicksrc = lis3dh._read_register_byte(_REG_CLICKSRC) # pylint: disable=protected-access
+    clicksrc = lis3dh._read_register_byte(
+        _REG_CLICKSRC
+    )  # pylint: disable=protected-access
     if clicksrc & 0b01000000 > 0:
         # Click was detected!  Quickly read 32 values from the accelerometer
         # and look for the maximum magnitude values.  Because the

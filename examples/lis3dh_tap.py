@@ -6,13 +6,15 @@ import adafruit_lis3dh
 
 # Hardware I2C setup. Use the CircuitPlayground built-in accelerometer if available;
 # otherwise check I2C pins.
-if hasattr(board, 'ACCELEROMETER_SCL'):
+if hasattr(board, "ACCELEROMETER_SCL"):
     i2c = busio.I2C(board.ACCELEROMETER_SCL, board.ACCELEROMETER_SDA)
     int1 = digitalio.DigitalInOut(board.ACCELEROMETER_INTERRUPT)
     lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x19, int1=int1)
 else:
     i2c = busio.I2C(board.SCL, board.SDA)
-    int1 = digitalio.DigitalInOut(board.D9)  # Set this to the correct pin for the interrupt!
+    int1 = digitalio.DigitalInOut(
+        board.D9
+    )  # Set this to the correct pin for the interrupt!
     lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, int1=int1)
 
 # Hardware SPI setup:
@@ -39,5 +41,5 @@ lis3dh.set_tap(2, 60)
 # Loop forever printing if a double tap is detected.
 while True:
     if lis3dh.tapped:
-        print('Tapped!')
+        print("Tapped!")
         time.sleep(0.01)
