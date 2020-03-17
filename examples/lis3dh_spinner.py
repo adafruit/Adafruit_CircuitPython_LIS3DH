@@ -20,18 +20,17 @@ import neopixel
 
 # Configuration:
 ACCEL_RANGE = adafruit_lis3dh.RANGE_16_G  # Accelerometer range.
-TAP_THRESHOLD = 20              # Accelerometer tap threshold.  Higher values
-                                # mean you need to tap harder to start a spin.
-SPINNER_DECAY = 0.5             # Decay rate for the spinner.  Set to a value
-                                # from 0 to 1.0 where lower values mean the
-                                # spinner slows down faster.
-PRIMARY_COLOR = (0, 255, 0)     # Color of the spinner dots.
-SECONDARY_COLOR = (0, 0, 0)     # Background color of the spinner.
+TAP_THRESHOLD = 20  # Accelerometer tap threshold.  Higher values
+# mean you need to tap harder to start a spin.
+SPINNER_DECAY = 0.5  # Decay rate for the spinner.  Set to a value
+# from 0 to 1.0 where lower values mean the
+# spinner slows down faster.
+PRIMARY_COLOR = (0, 255, 0)  # Color of the spinner dots.
+SECONDARY_COLOR = (0, 0, 0)  # Background color of the spinner.
 
 
 # Define a class that represents the fidget spinner.
 class FidgetSpinner:
-
     def __init__(self, decay=0.5):
         self._decay = decay
         self._velocity = 0.0
@@ -46,8 +45,8 @@ class FidgetSpinner:
         # Increment elapsed time and compute the current velocity after a
         # decay of the initial velocity.
         self._elapsed += delta
-        current_velocity = self._velocity*math.pow(self._decay, self._elapsed)
-        self._position += current_velocity*delta
+        current_velocity = self._velocity * math.pow(self._decay, self._elapsed)
+        self._position += current_velocity * delta
         # Make sure the position stays within values that range from 0 to <10.
         self._position = math.fmod(self._position, 10.0)
         if self._position < 0.0:
@@ -90,7 +89,9 @@ last = time.monotonic()  # Keep track of the last time the loop ran.
 while True:
     # Read the raw click detection register value and check if there was
     # a click detected.
-    clicksrc = lis3dh._read_register_byte(_REG_CLICKSRC) # pylint: disable=protected-access
+    clicksrc = lis3dh._read_register_byte(
+        _REG_CLICKSRC
+    )  # pylint: disable=protected-access
     if clicksrc & 0b01000000 > 0:
         # Click was detected!  Quickly read 32 values from the accelerometer
         # FIFO and look for the maximum magnitude values.

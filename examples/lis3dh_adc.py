@@ -6,13 +6,14 @@ import time
 import board
 import busio
 import adafruit_lis3dh
+
 # Uncomment if using SPI
-#import digitalio
+# import digitalio
 
 
 # Hardware I2C setup. Use the CircuitPlayground built-in accelerometer if available;
 # otherwise check I2C pins.
-if hasattr(board, 'ACCELEROMETER_SCL'):
+if hasattr(board, "ACCELEROMETER_SCL"):
     i2c = busio.I2C(board.ACCELEROMETER_SCL, board.ACCELEROMETER_SDA)
     lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x19)
 else:
@@ -24,9 +25,9 @@ else:
 # cs = digitalio.DigitalInOut(board.D5)  # Set to correct CS pin!
 # lis3dh = adafruit_lis3dh.LIS3DH_SPI(spi, cs)
 
-#PyGamer I2C Setup:
-#i2c = busio.I2C(board.SCL, board.SDA)
-#lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x19)
+# PyGamer I2C Setup:
+# i2c = busio.I2C(board.SCL, board.SDA)
+# lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x19)
 
 
 # Loop forever printing ADC readings.
@@ -35,5 +36,5 @@ while True:
     adc1_raw = lis3dh.read_adc_raw(1)
     # Or read the ADC value in millivolts:
     adc1_mV = lis3dh.read_adc_mV(1)
-    print('ADC 1 = {} ({} mV)'.format(adc1_raw, adc1_mV))
+    print("ADC 1 = {} ({} mV)".format(adc1_raw, adc1_mV))
     time.sleep(1)
