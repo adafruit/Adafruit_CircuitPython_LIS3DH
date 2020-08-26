@@ -42,7 +42,6 @@ __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_LIS3DH.git"
 
 # Register addresses:
-# pylint: disable=bad-whitespace
 _REG_OUTADC1_L = const(0x08)
 _REG_WHOAMI = const(0x0F)
 _REG_TEMPCFG = const(0x1F)
@@ -78,7 +77,6 @@ DATARATE_LOWPOWER_5KHZ = const(0b1001)
 
 # Other constants
 STANDARD_GRAVITY = 9.806
-# pylint: enable=bad-whitespace
 
 # the named tuple returned by the class
 AccelerationTuple = namedtuple("acceleration", ("x", "y", "z"))

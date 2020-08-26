@@ -15,8 +15,8 @@ import busio
 
 from micropython import const
 
-import adafruit_lis3dh
 import neopixel
+import adafruit_lis3dh
 
 # Configuration:
 ACCEL_RANGE = adafruit_lis3dh.RANGE_16_G  # Accelerometer range.
