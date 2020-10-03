@@ -39,7 +39,7 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = "Adafruit VL53L0X Library"
+project = "Adafruit LIS3DH Library"
 copyright = "2017 Tony DiCola"
 author = "Tony DiCola"
 
@@ -114,7 +114,7 @@ html_static_path = ["_static"]
 html_favicon = "_static/favicon.ico"
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "AdafruitVL53L0XLibrarydoc"
+htmlhelp_basename = "AdafruitLIS3DHLibrarydoc"
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -139,8 +139,8 @@ latex_elements = {
 latex_documents = [
     (
         master_doc,
-        "AdafruitVL53L0XLibrary.tex",
-        "Adafruit VL53L0X Library Documentation",
+        "AdafruitLIS3DHLibrary.tex",
+        "Adafruit LIS3DH Library Documentation",
         author,
         "manual",
     ),
@@ -153,8 +153,8 @@ latex_documents = [
 man_pages = [
     (
         master_doc,
-        "adafruitVL53L0Xlibrary",
-        "Adafruit VL53L0X Library Documentation",
+        "adafruitLIS3DHlibrary",
+        "Adafruit LIS3DH Library Documentation",
         [author],
         1,
     )
@@ -168,11 +168,11 @@ man_pages = [
 texinfo_documents = [
     (
         master_doc,
-        "AdafruitVL53L0XLibrary",
-        "Adafruit VL53L0X Library Documentation",
+        "adafruitLIS3DHlibrary",
+        "Adafruit LIS3DH Library Documentation",
         author,
-        "AdafruitVL53L0XLibrary",
-        "One line description of project.",
+        "adafruitLIS3DHlibrary",
+        "A CircuitPython library for the LIS3DH.",
         "Miscellaneous",
     ),
 ]
