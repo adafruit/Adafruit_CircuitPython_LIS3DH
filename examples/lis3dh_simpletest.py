@@ -1,6 +1,5 @@
 import time
 import board
-import digitalio
 import busio
 import adafruit_lis3dh
 
