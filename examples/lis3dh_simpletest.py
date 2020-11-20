@@ -8,23 +8,19 @@ import adafruit_lis3dh
 # otherwise check I2C pins.
 if hasattr(board, "ACCELEROMETER_SCL"):
     i2c = busio.I2C(board.ACCELEROMETER_SCL, board.ACCELEROMETER_SDA)
-    int1 = digitalio.DigitalInOut(board.ACCELEROMETER_INTERRUPT)
-    lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x19, int1=int1)
+    lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x19)
 else:
     i2c = busio.I2C(board.SCL, board.SDA)
-    int1 = digitalio.DigitalInOut(board.D6)  # Set to correct pin for interrupt!
-    lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, int1=int1)
+    lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c)
 
 # Hardware SPI setup:
 # spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 # cs = digitalio.DigitalInOut(board.D5)  # Set to correct CS pin!
-# int1 = digitalio.DigitalInOut(board.D6)  # Set to correct pin for interrupt!
-# lis3dh = adafruit_lis3dh.LIS3DH_SPI(spi, cs, int1=int1)
+# lis3dh = adafruit_lis3dh.LIS3DH_SPI(spi, cs)
 
 # PyGamer or MatrixPortal I2C Setup:
 # i2c = busio.I2C(board.SCL, board.SDA)
-# int1 = digitalio.DigitalInOut(board.ACCELEROMETER_INTERRUPT)
-# lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x19, int1=int1)
+# lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x19)
 
 
 # Set range of accelerometer (can be RANGE_2_G, RANGE_4_G, RANGE_8_G or RANGE_16_G).
