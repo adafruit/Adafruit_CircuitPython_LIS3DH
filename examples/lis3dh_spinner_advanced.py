@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2021 ladyada for Adafruit Industries
+# SPDX-License-Identifier: MIT
+
 # Circuit Playground Express CircuitPython Advanced Fidget Spinner
 #
 # This is a more advanced version of the fidget spinner which lets you change

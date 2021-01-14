@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2021 ladyada for Adafruit Industries
+# SPDX-License-Identifier: MIT
+
 # Circuit Playground Express CircuitPython Fidget Spinner
 # This is meant to work with the Circuit Playground Express board:
 #   https://www.adafruit.com/product/3333
