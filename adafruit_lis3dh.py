@@ -1,8 +1,10 @@
+# SPDX-FileCopyrightText: 2017 Tony DiCola for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 # Adafruit LIS3DH Accelerometer CircuitPython Driver
 # Based on the Arduino LIS3DH driver from:
 #   https://github.com/adafruit/Adafruit_LIS3DH/
-# Author: Tony DiCola
-# License: MIT License (https://en.wikipedia.org/wiki/MIT_License)
 """
 `adafruit_lis3dh`
 ====================================================
@@ -114,9 +116,9 @@ class LIS3DH:
     @property
     def data_rate(self):
         """The data rate of the accelerometer.  Can be DATA_RATE_400_HZ, DATA_RATE_200_HZ,
-           DATA_RATE_100_HZ, DATA_RATE_50_HZ, DATA_RATE_25_HZ, DATA_RATE_10_HZ,
-           DATA_RATE_1_HZ, DATA_RATE_POWERDOWN, DATA_RATE_LOWPOWER_1K6HZ, or
-           DATA_RATE_LOWPOWER_5KHZ."""
+        DATA_RATE_100_HZ, DATA_RATE_50_HZ, DATA_RATE_25_HZ, DATA_RATE_10_HZ,
+        DATA_RATE_1_HZ, DATA_RATE_POWERDOWN, DATA_RATE_LOWPOWER_1K6HZ, or
+        DATA_RATE_LOWPOWER_5KHZ."""
         ctl1 = self._read_register_byte(_REG_CTRL1)
         return (ctl1 >> 4) & 0x0F
 
@@ -130,7 +132,7 @@ class LIS3DH:
     @property
     def range(self):
         """The range of the accelerometer.  Can be RANGE_2_G, RANGE_4_G, RANGE_8_G, or
-           RANGE_16_G."""
+        RANGE_16_G."""
         ctl4 = self._read_register_byte(_REG_CTRL4)
         return (ctl4 >> 4) & 0x03
 
@@ -179,7 +181,7 @@ class LIS3DH:
 
         :param total_delay: The total time in seconds it takes to obtain avg_count
                             readings from acceleration. (Default 0.1)
-         """
+        """
         shake_accel = (0, 0, 0)
         for _ in range(avg_count):
             # shake_accel creates a list of tuples from acceleration data.

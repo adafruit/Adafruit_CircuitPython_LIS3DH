@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2021 ladyada for Adafruit Industries
+# SPDX-License-Identifier: MIT
+
 # Analog to digital converter example.
 # Will loop forever printing ADC channel 1 raw and mV values every second.
 # NOTE the ADC can only read voltages in the range of ~900mV to 1800mV!
