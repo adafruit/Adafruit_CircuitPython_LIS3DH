@@ -23,6 +23,8 @@ Table of Contents
 .. toctree::
     :caption: Tutorials
 
+    Adafruit LIS3DH Triple-Axis Accelerometer Breakout Learning Guide <https://learn.adafruit.com/adafruit-lis3dh-triple-axis-accelerometer-breakout>
+
 .. toctree::
     :caption: Related Products
 
