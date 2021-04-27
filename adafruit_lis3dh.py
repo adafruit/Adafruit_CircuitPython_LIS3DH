@@ -27,8 +27,8 @@ Implementation Notes
 
 **Software and Dependencies:**
 
-* Adafruit CircuitPython firmware for the ESP8622 and M0-based boards:
-  https://github.com/adafruit/circuitpython/releases
+* Adafruit CircuitPython firmware for the supported boards:
+  https://circuitpython.org/downloads
 * Adafruit's Bus Device library: https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
 """
 
@@ -85,7 +85,14 @@ AccelerationTuple = namedtuple("acceleration", ("x", "y", "z"))
 
 
 class LIS3DH:
-    """Driver base for the LIS3DH accelerometer."""
+    """Driver base for the LIS3DH accelerometer.
+
+    :param digitalio.DigitalInOut int1. pin on the sensor that would
+    act as an in interrupt
+    :param digitalio.DigitalInOut int2. pin on the sensor that would
+    act as an in interrupt
+
+    """
 
     def __init__(self, int1=None, int2=None):
         # Check device ID.
@@ -115,10 +122,22 @@ class LIS3DH:
 
     @property
     def data_rate(self):
-        """The data rate of the accelerometer.  Can be DATA_RATE_400_HZ, DATA_RATE_200_HZ,
-        DATA_RATE_100_HZ, DATA_RATE_50_HZ, DATA_RATE_25_HZ, DATA_RATE_10_HZ,
-        DATA_RATE_1_HZ, DATA_RATE_POWERDOWN, DATA_RATE_LOWPOWER_1K6HZ, or
-        DATA_RATE_LOWPOWER_5KHZ."""
+        """The data rate of the accelerometer.
+
+        Could have the following values:
+
+        * DATA_RATE_400_HZ
+        * DATA_RATE_200_HZ
+        * DATA_RATE_100_HZ
+        * DATA_RATE_50_HZ
+        * DATA_RATE_25_HZ
+        * DATA_RATE_10_HZ
+        * DATA_RATE_1_HZ
+        * DATA_RATE_POWERDOWN
+        * DATA_RATE_LOWPOWER_1K6HZ
+        * DATA_RATE_LOWPOWER_5KHZ.
+
+        """
         ctl1 = self._read_register_byte(_REG_CTRL1)
         return (ctl1 >> 4) & 0x0F
 
@@ -131,8 +150,16 @@ class LIS3DH:
 
     @property
     def range(self):
-        """The range of the accelerometer.  Can be RANGE_2_G, RANGE_4_G, RANGE_8_G, or
-        RANGE_16_G."""
+        """The range of the accelerometer.
+
+        Could have the following values:
+
+        * RANGE_2_G
+        * RANGE_4_G
+        * RANGE_8_G
+        * RANGE_16_G.
+
+        """
         ctl4 = self._read_register_byte(_REG_CTRL4)
         return (ctl4 >> 4) & 0x03
 
@@ -145,7 +172,8 @@ class LIS3DH:
 
     @property
     def acceleration(self):
-        """The x, y, z acceleration values returned in a 3-tuple and are in m / s ^ 2."""
+        """The x, y, z acceleration values returned
+        in a 3-tuple and are in :math:`m / s ^ 2`"""
         divider = 1
         accel_range = self.range
         if accel_range == RANGE_16_G:
@@ -167,21 +195,23 @@ class LIS3DH:
         return AccelerationTuple(x, y, z)
 
     def shake(self, shake_threshold=30, avg_count=10, total_delay=0.1):
+        """Detect when the accelerometer is shaken. Optional parameters:
+
+        :param int shake_threshold: Increase or decrease to change shake sensitivity.
+                                    This requires a minimum value of 10.
+                                    10 is the total acceleration if the board is not
+                                    moving, therefore anything less than
+                                    10 will erroneously report a constant shake detected.
+                                    Defaults to :const:`30`
+
+        :param int avg_count: The number of readings taken and used for the average
+                              acceleration. Default to :const:`10`
+
+        :param float total_delay: The total time in seconds it takes to obtain avg_count
+                                  readings from acceleration. Defaults to :const:`0.1`
+
         """
-        Detect when the accelerometer is shaken. Optional parameters:
 
-        :param shake_threshold: Increase or decrease to change shake sensitivity. This
-                                requires a minimum value of 10. 10 is the total
-                                acceleration if the board is not moving, therefore
-                                anything less than 10 will erroneously report a constant
-                                shake detected. (Default 30)
-
-        :param avg_count: The number of readings taken and used for the average
-                          acceleration. (Default 10)
-
-        :param total_delay: The total time in seconds it takes to obtain avg_count
-                            readings from acceleration. (Default 0.1)
-        """
         shake_accel = (0, 0, 0)
         for _ in range(avg_count):
             # shake_accel creates a list of tuples from acceleration data.
@@ -198,7 +228,7 @@ class LIS3DH:
         return total_accel > shake_threshold
 
     def read_adc_raw(self, adc):
-        """Retrieve the raw analog to digital converter value.  ADC must be a
+        """Retrieve the raw analog to digital converter value. ADC must be a
         value 1, 2, or 3.
         """
         if adc < 1 or adc > 3:
@@ -230,18 +260,19 @@ class LIS3DH:
     def tapped(self):
         """
         True if a tap was detected recently. Whether its a single tap or double tap is
-        determined by the tap param on ``set_tap``. ``tapped`` may be True over
+        determined by the tap param on :attr:`set_tap`. :attr:`tapped` may be True over
         multiple reads even if only a single tap or single double tap occurred if the
         interrupt (int) pin is not specified.
 
-        The following example uses ``i2c`` and specifies the interrupt pin:
+        The following example uses `board.I2C` and specifies the interrupt pin:
 
         .. code-block:: python
 
             import adafruit_lis3dh
             import digitalio
+            import board
 
-            i2c = busio.I2C(board.SCL, board.SDA)
+            i2c = board.I2C()  # uses board.SCL and board.SDA
             int1 = digitalio.DigitalInOut(board.D11) # pin connected to interrupt
             lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, int1=int1)
             lis3dh.range = adafruit_lis3dh.RANGE_8_G
@@ -275,10 +306,11 @@ class LIS3DH:
                               the accelerometer range.  Good values are 5-10 for 16G,
                               10-20 for 8G, 20-40 for 4G, and 40-80 for 2G.
 
-        :param int time_limit: TIME_LIMIT register value (default 10).
-        :param int time_latency: TIME_LATENCY register value (default 20).
-        :param int time_window: TIME_WINDOW register value (default 255).
+        :param int time_limit: TIME_LIMIT register value. Defaults to :const:`10`
+        :param int time_latency: TIME_LATENCY register value. Defaults to :const:`20`
+        :param int time_window: TIME_WINDOW register value. Defaults to :const:`255`
         :param int click_cfg: CLICK_CFG register value.
+
         """
         if (tap < 0 or tap > 2) and click_cfg is None:
             raise ValueError(
@@ -324,7 +356,37 @@ class LIS3DH:
 
 
 class LIS3DH_I2C(LIS3DH):
-    """Driver for the LIS3DH accelerometer connected over I2C."""
+    """Driver for the LIS3DH accelerometer connected over I2C.
+
+    :param ~busio.I2C i2c: The I2C bus the LIS3DH is connected to.
+    :param address: The I2C device address. Defaults to :const:`0x18`
+
+
+    **Quickstart: Importing and using the device**
+
+        Here is an example of using the :class:`LIS3DH_I2C` class.
+        First you will need to import the libraries to use the sensor
+
+        .. code-block:: python
+
+            import board
+            import adafruit_lis3dh
+
+        Once this is done you can define your `board.I2C` object and define your sensor object
+
+        .. code-block:: python
+
+            i2c = board.I2C()  # uses board.SCL and board.SDA
+            lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c)
+
+        Now you have access to the :attr:`acceleration` attribute
+
+        .. code-block:: python
+
+            acc_x, acc_y, acc_z = lis3dh.acceleration
+
+
+    """
 
     def __init__(self, i2c, *, address=0x18, int1=None, int2=None):
         import adafruit_bus_device.i2c_device as i2c_device  # pylint: disable=import-outside-toplevel
@@ -348,7 +410,36 @@ class LIS3DH_I2C(LIS3DH):
 
 
 class LIS3DH_SPI(LIS3DH):
-    """Driver for the LIS3DH accelerometer connected over SPI."""
+    """Driver for the LIS3DH accelerometer connected over SPI.
+
+    :param ~busio.I2C i2c: The I2C bus the LIS3DH is connected to.
+    :param address: The I2C device address. Defaults to :const:`0x18`
+
+
+    **Quickstart: Importing and using the device**
+
+        Here is an example of using the :class:`LIS3DH_SPI` class.
+        First you will need to import the libraries to use the sensor
+
+        .. code-block:: python
+
+            import board
+            import adafruit_lis3dh
+
+        Once this is done you can define your `board.SPI` object and define your sensor object
+
+        .. code-block:: python
+
+            i2c = board.SPI()
+            lis3dh = adafruit_lis3dh.LIS3DH_SPI(spi)
+
+        Now you have access to the :attr:`acceleration` attribute
+
+        .. code-block:: python
+
+            acc_x, acc_y, acc_z = lis3dh.acceleration
+
+    """
 
     def __init__(self, spi, cs, *, baudrate=100000, int1=None, int2=None):
         import adafruit_bus_device.spi_device as spi_device  # pylint: disable=import-outside-toplevel

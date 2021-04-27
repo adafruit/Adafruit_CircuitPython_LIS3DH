@@ -20,16 +20,16 @@ if hasattr(board, "ACCELEROMETER_SCL"):
     i2c = busio.I2C(board.ACCELEROMETER_SCL, board.ACCELEROMETER_SDA)
     lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x19)
 else:
-    i2c = busio.I2C(board.SCL, board.SDA)
+    i2c = board.I2C()  # uses board.SCL and board.SDA
     lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c)
 
 # Hardware SPI setup:
-# spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
+# spi = board.SPI()
 # cs = digitalio.DigitalInOut(board.D5)  # Set to correct CS pin!
 # lis3dh = adafruit_lis3dh.LIS3DH_SPI(spi, cs)
 
 # PyGamer I2C Setup:
-# i2c = busio.I2C(board.SCL, board.SDA)
+# i2c = board.I2C(A)
 # lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, address=0x19)
 
 
