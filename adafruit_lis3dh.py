@@ -389,7 +389,9 @@ class LIS3DH_I2C(LIS3DH):
     """
 
     def __init__(self, i2c, *, address=0x18, int1=None, int2=None):
-        import adafruit_bus_device.i2c_device as i2c_device  # pylint: disable=import-outside-toplevel
+        from adafruit_bus_device import (  # pylint: disable=import-outside-toplevel
+            i2c_device,
+        )
 
         self._i2c = i2c_device.I2CDevice(i2c, address)
         self._buffer = bytearray(6)
@@ -442,7 +444,9 @@ class LIS3DH_SPI(LIS3DH):
     """
 
     def __init__(self, spi, cs, *, baudrate=100000, int1=None, int2=None):
-        import adafruit_bus_device.spi_device as spi_device  # pylint: disable=import-outside-toplevel
+        from adafruit_bus_device import (  # pylint: disable=import-outside-toplevel
+            spi_device,
+        )
 
         self._spi = spi_device.SPIDevice(spi, cs, baudrate=baudrate)
         self._buffer = bytearray(6)
