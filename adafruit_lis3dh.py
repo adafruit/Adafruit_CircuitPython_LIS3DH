@@ -87,11 +87,10 @@ AccelerationTuple = namedtuple("acceleration", ("x", "y", "z"))
 class LIS3DH:
     """Driver base for the LIS3DH accelerometer.
 
-    :param digitalio.DigitalInOut int1. pin on the sensor that would
-    act as an in interrupt
-    :param digitalio.DigitalInOut int2. pin on the sensor that would
-    act as an in interrupt
-
+    :param digitalio.DigitalInOut int1: `digitalio.DigitalInOut` connected to
+      the LIS3DH INT1 interrupt pin
+    :param digitalio.DigitalInOut int2: `digitalio.DigitalInOut` connected to
+      the LIS3DH INT2 interrupt pin
     """
 
     def __init__(self, int1=None, int2=None):
