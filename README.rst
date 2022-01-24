@@ -3,7 +3,7 @@ Introduction
 ============
 
 .. image:: https://readthedocs.org/projects/adafruit-circuitpython-lis3dh/badge/?version=latest
-    :target: https://circuitpython.readthedocs.io/projects/lis3dh/en/latest/
+    :target: https://docs.circuitpython.org/projects/lis3dh/en/latest/
     :alt: Documentation Status
 
 .. image :: https://img.shields.io/discord/327254708534116352.svg
@@ -62,7 +62,7 @@ To install in a virtual environment in your current project:
 Documentation
 =============
 
-API documentation for this library can be found on `Read the Docs <https://circuitpython.readthedocs.io/projects/lis3dh/en/latest/>`_.
+API documentation for this library can be found on `Read the Docs <https://docs.circuitpython.org/projects/lis3dh/en/latest/>`_.
 
 Contributing
 ============
