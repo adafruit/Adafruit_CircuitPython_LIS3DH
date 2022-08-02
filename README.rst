@@ -14,6 +14,10 @@ Introduction
     :target: https://github.com/adafruit/Adafruit_CircuitPython_LIS3DH/actions/
     :alt: Build Status
 
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/psf/black
+    :alt: Code Style: Black
+
 Adafruit CircuitPython module for the LIS3DH accelerometer.
 
 Note this module is made to work with CircuitPython and not MicroPython APIs.
