@@ -65,7 +65,7 @@ RANGE_16_G = const(0b11)  # +/- 16g
 RANGE_8_G = const(0b10)  # +/- 8g
 RANGE_4_G = const(0b01)  # +/- 4g
 RANGE_2_G = const(0b00)  # +/- 2g (default value)
-DATARATE_1344_HZ = const(0b1001)  # 1.344 KHz
+DATARATE_1250_HZ = const(0b1001)  # 1.25 KHz
 DATARATE_400_HZ = const(0b0111)  # 400Hz
 DATARATE_200_HZ = const(0b0110)  # 200Hz
 DATARATE_100_HZ = const(0b0101)  # 100Hz
@@ -74,7 +74,7 @@ DATARATE_25_HZ = const(0b0011)  # 25Hz
 DATARATE_10_HZ = const(0b0010)  # 10 Hz
 DATARATE_1_HZ = const(0b0001)  # 1 Hz
 DATARATE_POWERDOWN = const(0)
-DATARATE_LOWPOWER_1K6HZ = const(0b1000)
+DATARATE_LOWPOWER_1K5HZ = const(0b1000)
 DATARATE_LOWPOWER_5KHZ = const(0b1001)
 
 # Other constants
@@ -125,6 +125,7 @@ class LIS3DH:
 
         Could have the following values:
 
+        * DATARATE_1250_HZ
         * DATARATE_400_HZ
         * DATARATE_200_HZ
         * DATARATE_100_HZ
@@ -133,7 +134,7 @@ class LIS3DH:
         * DATARATE_10_HZ
         * DATARATE_1_HZ
         * DATARATE_POWERDOWN
-        * DATARATE_LOWPOWER_1K6HZ
+        * DATARATE_LOWPOWER_1K5HZ
         * DATARATE_LOWPOWER_5KHZ.
 
         """
