@@ -40,6 +40,13 @@ import digitalio
 
 from micropython import const
 
+try:
+    from typing_extensions import Literal
+    from busio import I2C, SPI
+except ImportError:
+    pass
+
+
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_LIS3DH.git"
 
@@ -93,7 +100,9 @@ class LIS3DH:
       the LIS3DH INT2 interrupt pin
     """
 
-    def __init__(self, int1=None, int2=None):
+    def __init__(
+        self, int1: digitalio.DigitalInOut = None, int2: digitalio.DigitalInOut = None
+    ) -> None:
         # Check device ID.
         device_id = self._read_register_byte(_REG_WHOAMI)
         if device_id != 0x33:
@@ -120,7 +129,11 @@ class LIS3DH:
             self._int1.pull = digitalio.Pull.UP
 
     @property
-    def data_rate(self):
+    def data_rate(
+        self,
+    ) -> Literal[
+        0, 0b0001, 0b0010, 0b0011, 0b0100, 0b0101, 0b0110, 0b0111, 0b1000, 0b1001
+    ]:
         """The data rate of the accelerometer.
 
         Could have the following values:
@@ -141,14 +154,19 @@ class LIS3DH:
         return (ctl1 >> 4) & 0x0F
 
     @data_rate.setter
-    def data_rate(self, rate):
+    def data_rate(
+        self,
+        rate: Literal[
+            0, 0b0001, 0b0010, 0b0011, 0b0100, 0b0101, 0b0110, 0b0111, 0b1000, 0b1001
+        ],
+    ):
         ctl1 = self._read_register_byte(_REG_CTRL1)
         ctl1 &= ~(0xF0)
         ctl1 |= rate << 4
         self._write_register_byte(_REG_CTRL1, ctl1)
 
     @property
-    def range(self):
+    def range(self) -> Literal[0b00, 0b01, 0b10, 0b11]:
         """The range of the accelerometer.
 
         Could have the following values:
@@ -163,14 +181,14 @@ class LIS3DH:
         return (ctl4 >> 4) & 0x03
 
     @range.setter
-    def range(self, range_value):
+    def range(self, range_value: Literal[0b00, 0b01, 0b10, 0b11]):
         ctl4 = self._read_register_byte(_REG_CTRL4)
         ctl4 &= ~0x30
         ctl4 |= range_value << 4
         self._write_register_byte(_REG_CTRL4, ctl4)
 
     @property
-    def acceleration(self):
+    def acceleration(self) -> AccelerationTuple:
         """The x, y, z acceleration values returned
         in a 3-tuple and are in :math:`m / s ^ 2`"""
         divider = 1
@@ -193,7 +211,9 @@ class LIS3DH:
 
         return AccelerationTuple(x, y, z)
 
-    def shake(self, shake_threshold=30, avg_count=10, total_delay=0.1):
+    def shake(
+        self, shake_threshold: int = 30, avg_count: int = 10, total_delay: float = 0.1
+    ) -> bool:
         """Detect when the accelerometer is shaken. Optional parameters:
 
         :param int shake_threshold: Increase or decrease to change shake sensitivity.
@@ -226,7 +246,7 @@ class LIS3DH:
         total_accel = math.sqrt(sum(map(lambda x: x * x, avg)))
         return total_accel > shake_threshold
 
-    def read_adc_raw(self, adc):
+    def read_adc_raw(self, adc: Literal[1, 2, 3]) -> int:
         """Retrieve the raw analog to digital converter value. ADC must be a
         value 1, 2, or 3.
         """
@@ -237,7 +257,8 @@ class LIS3DH:
             "<h", self._read_register((_REG_OUTADC1_L + ((adc - 1) * 2)) | 0x80, 2)[0:2]
         )[0]
 
-    def read_adc_mV(self, adc):  # pylint: disable=invalid-name
+    # pylint: disable=invalid-name
+    def read_adc_mV(self, adc: Literal[1, 2, 3]) -> float:
         """Read the specified analog to digital converter value in millivolts.
         ADC must be a value 1, 2, or 3.  NOTE the ADC can only measure voltages
         in the range of ~900-1200mV!
@@ -256,7 +277,7 @@ class LIS3DH:
         return 1800 + (raw + 32512) * (-900 / 65024)
 
     @property
-    def tapped(self):
+    def tapped(self) -> int:
         """
         True if a tap was detected recently. Whether its a single tap or double tap is
         determined by the tap param on :attr:`set_tap`. :attr:`tapped` may be True over
@@ -284,14 +305,14 @@ class LIS3DH:
 
     def set_tap(
         self,
-        tap,
-        threshold,
+        tap: Literal[0, 1, 2],
+        threshold: int,
         *,
-        time_limit=10,
-        time_latency=20,
-        time_window=255,
-        click_cfg=None
-    ):
+        time_limit: int = 10,
+        time_latency: int = 20,
+        time_window: int = 255,
+        click_cfg: int = None
+    ) -> None:
         """
         The tap detection parameters.
 
@@ -338,17 +359,17 @@ class LIS3DH:
         self._write_register_byte(_REG_TIMELATENCY, time_latency)
         self._write_register_byte(_REG_TIMEWINDOW, time_window)
 
-    def _read_register_byte(self, register):
+    def _read_register_byte(self, register: int) -> int:
         # Read a byte register value and return it.
         return self._read_register(register, 1)[0]
 
-    def _read_register(self, register, length):
+    def _read_register(self, register: int, length: int) -> None:
         # Read an arbitrarily long register (specified by length number of
         # bytes) and return a bytearray of the retrieved data.
         # Subclasses MUST implement this!
         raise NotImplementedError
 
-    def _write_register_byte(self, register, value):
+    def _write_register_byte(self, register: int, value: int) -> None:
         # Write a single byte register at the specified register address.
         # Subclasses MUST implement this!
         raise NotImplementedError
@@ -387,7 +408,14 @@ class LIS3DH_I2C(LIS3DH):
 
     """
 
-    def __init__(self, i2c, *, address=0x18, int1=None, int2=None):
+    def __init__(
+        self,
+        i2c: I2C,
+        *,
+        address: int = 0x18,
+        int1: digitalio.DigitalInOut = None,
+        int2: digitalio.DigitalInOut = None
+    ) -> None:
         from adafruit_bus_device import (  # pylint: disable=import-outside-toplevel
             i2c_device,
         )
@@ -396,14 +424,14 @@ class LIS3DH_I2C(LIS3DH):
         self._buffer = bytearray(6)
         super().__init__(int1=int1, int2=int2)
 
-    def _read_register(self, register, length):
+    def _read_register(self, register: int, length: int) -> bytearray:
         self._buffer[0] = register & 0xFF
         with self._i2c as i2c:
             i2c.write(self._buffer, start=0, end=1)
             i2c.readinto(self._buffer, start=0, end=length)
             return self._buffer
 
-    def _write_register_byte(self, register, value):
+    def _write_register_byte(self, register: int, value: int) -> None:
         self._buffer[0] = register & 0xFF
         self._buffer[1] = value & 0xFF
         with self._i2c as i2c:
@@ -442,7 +470,15 @@ class LIS3DH_SPI(LIS3DH):
 
     """
 
-    def __init__(self, spi, cs, *, baudrate=100000, int1=None, int2=None):
+    def __init__(
+        self,
+        spi: SPI,
+        cs: digitalio.DigitalInOut,
+        *,
+        baudrate: int = 100000,
+        int1: digitalio.DigitalInOut = None,
+        int2: digitalio.DigitalInOut = None
+    ) -> None:
         from adafruit_bus_device import (  # pylint: disable=import-outside-toplevel
             spi_device,
         )
@@ -451,7 +487,7 @@ class LIS3DH_SPI(LIS3DH):
         self._buffer = bytearray(6)
         super().__init__(int1=int1, int2=int2)
 
-    def _read_register(self, register, length):
+    def _read_register(self, register: int, length: int) -> bytearray:
         if length == 1:
             self._buffer[0] = (register | 0x80) & 0xFF  # Read single, bit 7 high.
         else:
@@ -461,7 +497,7 @@ class LIS3DH_SPI(LIS3DH):
             spi.readinto(self._buffer, start=0, end=length)  # pylint: disable=no-member
             return self._buffer
 
-    def _write_register_byte(self, register, value):
+    def _write_register_byte(self, register: int, value: int) -> None:
         self._buffer[0] = register & 0x7F  # Write, bit 7 low.
         self._buffer[1] = value & 0xFF
         with self._spi as spi:
