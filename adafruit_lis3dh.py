@@ -41,6 +41,7 @@ import digitalio
 from micropython import const
 
 try:
+    from typing import Optional
     from typing_extensions import Literal
     from busio import I2C, SPI
 except ImportError:
@@ -308,10 +309,10 @@ class LIS3DH:
         tap: Literal[0, 1, 2],
         threshold: int,
         *,
-        time_limit: int = 10,
-        time_latency: int = 20,
-        time_window: int = 255,
-        click_cfg: int = None
+        time_limit: Optional[int] = 10,
+        time_latency: Optional[int] = 20,
+        time_window: Optional[int] = 255,
+        click_cfg: Optional[int] = None
     ) -> None:
         """
         The tap detection parameters.
@@ -412,9 +413,9 @@ class LIS3DH_I2C(LIS3DH):
         self,
         i2c: I2C,
         *,
-        address: int = 0x18,
-        int1: digitalio.DigitalInOut = None,
-        int2: digitalio.DigitalInOut = None
+        address: Optional[int] = 0x18,
+        int1: Optional[digitalio.DigitalInOut] = None,
+        int2: Optional[digitalio.DigitalInOut] = None
     ) -> None:
         from adafruit_bus_device import (  # pylint: disable=import-outside-toplevel
             i2c_device,
@@ -475,9 +476,9 @@ class LIS3DH_SPI(LIS3DH):
         spi: SPI,
         cs: digitalio.DigitalInOut,
         *,
-        baudrate: int = 100000,
-        int1: digitalio.DigitalInOut = None,
-        int2: digitalio.DigitalInOut = None
+        baudrate: Optional[int] = 100000,
+        int1: Optional[digitalio.DigitalInOut] = None,
+        int2: Optional[digitalio.DigitalInOut] = None
     ) -> None:
         from adafruit_bus_device import (  # pylint: disable=import-outside-toplevel
             spi_device,
