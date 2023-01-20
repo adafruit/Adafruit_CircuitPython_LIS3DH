@@ -102,7 +102,9 @@ class LIS3DH:
     """
 
     def __init__(
-        self, int1: digitalio.DigitalInOut = None, int2: digitalio.DigitalInOut = None
+        self,
+        int1: Optional[digitalio.DigitalInOut] = None,
+        int2: Optional[digitalio.DigitalInOut] = None,
     ) -> None:
         # Check device ID.
         device_id = self._read_register_byte(_REG_WHOAMI)
@@ -132,9 +134,7 @@ class LIS3DH:
     @property
     def data_rate(
         self,
-    ) -> Literal[
-        0, 0b0001, 0b0010, 0b0011, 0b0100, 0b0101, 0b0110, 0b0111, 0b1000, 0b1001
-    ]:
+    ) -> int:
         """The data rate of the accelerometer.
 
         Could have the following values:
@@ -157,9 +157,7 @@ class LIS3DH:
     @data_rate.setter
     def data_rate(
         self,
-        rate: Literal[
-            0, 0b0001, 0b0010, 0b0011, 0b0100, 0b0101, 0b0110, 0b0111, 0b1000, 0b1001
-        ],
+        rate: int,
     ):
         ctl1 = self._read_register_byte(_REG_CTRL1)
         ctl1 &= ~(0xF0)
@@ -167,7 +165,7 @@ class LIS3DH:
         self._write_register_byte(_REG_CTRL1, ctl1)
 
     @property
-    def range(self) -> Literal[0b00, 0b01, 0b10, 0b11]:
+    def range(self) -> Literal[RANGE_2_G, RANGE_4_G, RANGE_8_G, RANGE_16_G]:
         """The range of the accelerometer.
 
         Could have the following values:
@@ -182,7 +180,7 @@ class LIS3DH:
         return (ctl4 >> 4) & 0x03
 
     @range.setter
-    def range(self, range_value: Literal[0b00, 0b01, 0b10, 0b11]):
+    def range(self, range_value: Literal[RANGE_2_G, RANGE_4_G, RANGE_8_G, RANGE_16_G]):
         ctl4 = self._read_register_byte(_REG_CTRL4)
         ctl4 &= ~0x30
         ctl4 |= range_value << 4
@@ -309,9 +307,9 @@ class LIS3DH:
         tap: Literal[0, 1, 2],
         threshold: int,
         *,
-        time_limit: Optional[int] = 10,
-        time_latency: Optional[int] = 20,
-        time_window: Optional[int] = 255,
+        time_limit: int = 10,
+        time_latency: int = 20,
+        time_window: int = 255,
         click_cfg: Optional[int] = None
     ) -> None:
         """
@@ -413,7 +411,7 @@ class LIS3DH_I2C(LIS3DH):
         self,
         i2c: I2C,
         *,
-        address: Optional[int] = 0x18,
+        address: int = 0x18,
         int1: Optional[digitalio.DigitalInOut] = None,
         int2: Optional[digitalio.DigitalInOut] = None
     ) -> None:
@@ -476,7 +474,7 @@ class LIS3DH_SPI(LIS3DH):
         spi: SPI,
         cs: digitalio.DigitalInOut,
         *,
-        baudrate: Optional[int] = 100000,
+        baudrate: int = 100000,
         int1: Optional[digitalio.DigitalInOut] = None,
         int2: Optional[digitalio.DigitalInOut] = None
     ) -> None:
