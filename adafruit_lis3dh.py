@@ -96,9 +96,9 @@ class LIS3DH:
     """Driver base for the LIS3DH accelerometer.
 
     :param digitalio.DigitalInOut int1: `digitalio.DigitalInOut` connected to
-      the LIS3DH INT1 interrupt pin
+      the LIS3DH INT interrupt pin
     :param digitalio.DigitalInOut int2: `digitalio.DigitalInOut` connected to
-      the LIS3DH INT2 interrupt pin
+      the LIS3DH I2 interrupt pin (only on STEMMA QT model)
     """
 
     def __init__(
@@ -440,9 +440,8 @@ class LIS3DH_I2C(LIS3DH):
 class LIS3DH_SPI(LIS3DH):
     """Driver for the LIS3DH accelerometer connected over SPI.
 
-    :param ~busio.I2C i2c: The I2C bus the LIS3DH is connected to.
-    :param address: The I2C device address. Defaults to :const:`0x18`
-
+    :param ~busio.SPI spi: The SPI bus the LIS3DH is connected to.
+    :param digitalio.DigitalInOut cs: The pin connected to the LIS3DH CS pin
 
     **Quickstart: Importing and using the device**
 
@@ -458,8 +457,9 @@ class LIS3DH_SPI(LIS3DH):
 
         .. code-block:: python
 
-            i2c = board.SPI()
-            lis3dh = adafruit_lis3dh.LIS3DH_SPI(spi)
+            spi = board.SPI()
+            cs = digitalio.DigitalInOut(board.D5)  # Set to correct CS pin!
+            lis3dh = adafruit_lis3dh.LIS3DH_SPI(spi, cs)
 
         Now you have access to the :attr:`acceleration` attribute
 
