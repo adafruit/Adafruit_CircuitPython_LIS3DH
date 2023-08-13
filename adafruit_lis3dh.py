@@ -129,7 +129,10 @@ class LIS3DH:
         self._int2 = int2
         if self._int1:
             self._int1.direction = digitalio.Direction.INPUT
-            self._int1.pull = digitalio.Pull.UP
+            try:
+                self._int1.pull = digitalio.Pull.UP
+            except AttributeError:
+                pass
 
     @property
     def data_rate(
