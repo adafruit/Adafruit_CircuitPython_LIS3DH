@@ -15,17 +15,15 @@
 #   https://github.com/adafruit/Adafruit_CircuitPython_NeoPixel
 # Author: Tony DiCola
 # License: MIT License (https://opensource.org/licenses/MIT)
-# pylint: disable=redefined-outer-name
 import math
 import time
 
 import board
 import busio
 import digitalio
-
+import neopixel
 from micropython import const
 
-import neopixel
 import adafruit_lis3dh
 
 # Configuration:
@@ -166,7 +164,6 @@ class SmoothAnimation:
         self._pixels.show()
 
 
-# pylint: disable=no-member
 # Initialize and turn off NeoPixels.
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, auto_write=False)
 pixels.fill((0, 0, 0))
@@ -200,10 +197,8 @@ lis3dh.set_tap(1, TAP_THRESHOLD, click_cfg=0x01)
 # Define register numbers, which are not exported from the library.
 _REG_CTRL5 = const(0x24)
 _REG_CLICKSRC = const(0x39)
-# pylint: disable=protected-access
 lis3dh._write_register_byte(_REG_CTRL5, 0b01001000)
 lis3dh._write_register_byte(0x2E, 0b10000000)  # Set FIFO_CTRL to Stream mode.
-# pylint: disable=protected-access
 
 # Create a fidget spinner object.
 spinner = FidgetSpinner(SPINNER_DECAY)
@@ -230,9 +225,7 @@ while True:
     # Read the raw click detection register value and check if there was
     # a click detected.  Remember only the X axis causes clicks because of
     # the register configuration set previously.
-    clicksrc = lis3dh._read_register_byte(
-        _REG_CLICKSRC
-    )  # pylint: disable=protected-access
+    clicksrc = lis3dh._read_register_byte(_REG_CLICKSRC)
     if clicksrc & 0b01000000 > 0:
         # Click was detected!  Quickly read 32 values from the accelerometer
         # and look for the maximum magnitude values.  Because the

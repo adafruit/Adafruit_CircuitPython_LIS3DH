@@ -6,8 +6,10 @@
 # NOTE the ADC can only read voltages in the range of ~900mV to 1800mV!
 
 import time
+
 import board
 import busio
+
 import adafruit_lis3dh
 
 # Uncomment if using SPI
@@ -40,5 +42,5 @@ while True:
     adc1_raw = lis3dh.read_adc_raw(1)
     # Or read the ADC value in millivolts:
     adc1_mV = lis3dh.read_adc_mV(1)
-    print("ADC 1 = {} ({} mV)".format(adc1_raw, adc1_mV))
+    print(f"ADC 1 = {adc1_raw} ({adc1_mV} mV)")
     time.sleep(1)

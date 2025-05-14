@@ -32,18 +32,19 @@ Implementation Notes
 * Adafruit's Bus Device library: https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
 """
 
-import time
 import math
-from collections import namedtuple
 import struct
-import digitalio
+import time
+from collections import namedtuple
 
+import digitalio
 from micropython import const
 
 try:
     from typing import Optional
-    from typing_extensions import Literal
+
     from busio import I2C, SPI
+    from typing_extensions import Literal
 except ImportError:
     pass
 
@@ -259,7 +260,6 @@ class LIS3DH:
             "<h", self._read_register((_REG_OUTADC1_L + ((adc - 1) * 2)) | 0x80, 2)[0:2]
         )[0]
 
-    # pylint: disable=invalid-name
     def read_adc_mV(self, adc: Literal[1, 2, 3]) -> float:
         """Read the specified analog to digital converter value in millivolts.
         ADC must be a value 1, 2, or 3.  NOTE the ADC can only measure voltages
@@ -313,7 +313,7 @@ class LIS3DH:
         time_limit: int = 10,
         time_latency: int = 20,
         time_window: int = 255,
-        click_cfg: Optional[int] = None
+        click_cfg: Optional[int] = None,
     ) -> None:
         """
         The tap detection parameters.
@@ -335,9 +335,7 @@ class LIS3DH:
 
         """
         if (tap < 0 or tap > 2) and click_cfg is None:
-            raise ValueError(
-                "Tap must be 0 (disabled), 1 (single tap), or 2 (double tap)!"
-            )
+            raise ValueError("Tap must be 0 (disabled), 1 (single tap), or 2 (double tap)!")
         if threshold > 127 or threshold < 0:
             raise ValueError("Threshold out of range (0-127)")
 
@@ -416,9 +414,9 @@ class LIS3DH_I2C(LIS3DH):
         *,
         address: int = 0x18,
         int1: Optional[digitalio.DigitalInOut] = None,
-        int2: Optional[digitalio.DigitalInOut] = None
+        int2: Optional[digitalio.DigitalInOut] = None,
     ) -> None:
-        from adafruit_bus_device import (  # pylint: disable=import-outside-toplevel
+        from adafruit_bus_device import (  # noqa: PLC0415
             i2c_device,
         )
 
@@ -479,9 +477,9 @@ class LIS3DH_SPI(LIS3DH):
         *,
         baudrate: int = 100000,
         int1: Optional[digitalio.DigitalInOut] = None,
-        int2: Optional[digitalio.DigitalInOut] = None
+        int2: Optional[digitalio.DigitalInOut] = None,
     ) -> None:
-        from adafruit_bus_device import (  # pylint: disable=import-outside-toplevel
+        from adafruit_bus_device import (  # noqa: PLC0415
             spi_device,
         )
 
@@ -495,12 +493,12 @@ class LIS3DH_SPI(LIS3DH):
         else:
             self._buffer[0] = (register | 0xC0) & 0xFF  # Read multiple, bit 6&7 high.
         with self._spi as spi:
-            spi.write(self._buffer, start=0, end=1)  # pylint: disable=no-member
-            spi.readinto(self._buffer, start=0, end=length)  # pylint: disable=no-member
+            spi.write(self._buffer, start=0, end=1)
+            spi.readinto(self._buffer, start=0, end=length)
             return self._buffer
 
     def _write_register_byte(self, register: int, value: int) -> None:
         self._buffer[0] = register & 0x7F  # Write, bit 7 low.
         self._buffer[1] = value & 0xFF
         with self._spi as spi:
-            spi.write(self._buffer, start=0, end=2)  # pylint: disable=no-member
+            spi.write(self._buffer, start=0, end=2)

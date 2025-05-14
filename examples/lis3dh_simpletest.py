@@ -2,8 +2,10 @@
 # SPDX-License-Identifier: MIT
 
 import time
+
 import board
 import busio
+
 import adafruit_lis3dh
 
 # Hardware I2C setup. Use the CircuitPlayground built-in accelerometer if available;
@@ -33,9 +35,7 @@ lis3dh.range = adafruit_lis3dh.RANGE_2_G
 while True:
     # Read accelerometer values (in m / s ^ 2).  Returns a 3-tuple of x, y,
     # z axis values.  Divide them by 9.806 to convert to Gs.
-    x, y, z = [
-        value / adafruit_lis3dh.STANDARD_GRAVITY for value in lis3dh.acceleration
-    ]
-    print("x = %0.3f G, y = %0.3f G, z = %0.3f G" % (x, y, z))
+    x, y, z = (value / adafruit_lis3dh.STANDARD_GRAVITY for value in lis3dh.acceleration)
+    print(f"x = {x:.3f} G, y = {y:.3f} G, z = {z:.3f} G")
     # Small delay to keep things responsive but give time for interrupt processing.
     time.sleep(0.1)
