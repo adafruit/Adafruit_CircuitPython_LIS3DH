@@ -215,7 +215,7 @@ class LIS3DH:
         return AccelerationTuple(x, y, z)
 
     def shake(
-        self, shake_threshold: int = 30, avg_count: int = 10, total_delay: float = 0.1
+        self, shake_threshold: int = 20, avg_count: int = 10, total_delay: float = 0.1
     ) -> bool:
         """Detect when the accelerometer is shaken. Optional parameters:
 
@@ -224,7 +224,7 @@ class LIS3DH:
                                     10 is the total acceleration if the board is not
                                     moving, therefore anything less than
                                     10 will erroneously report a constant shake detected.
-                                    Defaults to :const:`30`
+                                    Defaults to :const:`20`
 
         :param int avg_count: The number of readings taken and used for the average
                               acceleration. Default to :const:`10`
@@ -234,19 +234,15 @@ class LIS3DH:
 
         """
 
-        shake_accel = (0, 0, 0)
+        xs = ys = zs = 0
+        delay = total_delay / avg_count
         for _ in range(avg_count):
-            # shake_accel creates a list of tuples from acceleration data.
-            # zip takes multiple tuples and zips them together, as in:
-            # In : zip([-0.2, 0.0, 9.5], [37.9, 13.5, -72.8])
-            # Out: [(-0.2, 37.9), (0.0, 13.5), (9.5, -72.8)]
-            # map applies sum to each member of this tuple, resulting in a
-            # 3-member list. tuple converts this list into a tuple which is
-            # used as shake_accel.
-            shake_accel = tuple(map(sum, zip(shake_accel, self.acceleration)))
-            time.sleep(total_delay / avg_count)
-        avg = tuple(value / avg_count for value in shake_accel)
-        total_accel = math.sqrt(sum(map(lambda x: x * x, avg)))
+            x, y, z = self.acceleration
+            xs += x * x
+            ys += y * y
+            zs += z * z
+            time.sleep(delay)
+        total_accel = math.sqrt((xs + ys + zs) / avg_count)
         return total_accel > shake_threshold
 
     def read_adc_raw(self, adc: Literal[1, 2, 3]) -> int:
