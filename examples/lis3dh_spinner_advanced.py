@@ -235,8 +235,7 @@ while True:
         maxval = abs(lis3dh.acceleration[0])  # Grab just the X acceleration value.
         for i in range(31):
             x = abs(lis3dh.acceleration[0])
-            if x > maxval:
-                maxval = x
+            maxval = max(maxval, x)
         # Check if this was a positive or negative spin/click event.
         if clicksrc == 0b1010001:
             # Positive click, spin in a positive direction.
